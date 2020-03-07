@@ -45,6 +45,7 @@
                 :pushup                 [{:s 1 :r 20}]
                 :curl-wall-dumbell      [{:s 1 :r 10 :w 20}]}}])
 
+;; TODO turn this into it's own spec so it is easier to read spec validation fail output
 (defn sets-reps? [exercises]
   (->> exercises
        (sp/select [sp/MAP-VALS])
@@ -86,6 +87,8 @@
           (and (-> c first (> 2019))
                (-> c (nth 1) (> 2)))))))
 
+;; Invoke with
+;; clj -m workout-counter "$(cat ~/Nextcloud/gsd/workouts.edn)"
 (defn -main [workout-edn-str]
   (let [data                  (clojure.edn/read-string workout-edn-str)
         spec-fail-explanation (s/explain-str workouts-spec data)]
