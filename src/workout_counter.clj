@@ -51,11 +51,13 @@
        (every? (fn [srws]
                  (->> srws
                       (every? (fn [srw]
-                                (and
-                                 (map? srw)
-                                 (contains? srw :s)
-                                 (or (contains? srw :time)
-                                     (contains? srw :r))))))))))
+                                (if (map? srw)
+                                  (and
+                                   (contains? srw :s)
+                                   (or (contains? srw :time)
+                                       (contains? srw :steps)
+                                       (contains? srw :r)))
+                                  (keyword? srw)))))))))
 
 (defn date-int-coll? [c]
   (and (= 5 (count c))
@@ -64,13 +66,13 @@
        (-> (nth c 1) (> 0))
        (-> (nth c 2) (> 0))
        (-> (nth c 1) (< 13))
-       (-> (nth c 2) (< 13))))
+       (-> (nth c 2) (< 32))))
 
-(def workouts-spec-data [{:start     date-int-coll?
-                          :stop      date-int-coll?
-                          :gym       boolean?
-                          :exercises #(and (map? %)
-                                           (sets-reps? %))}])
+(def workouts-spec-data [{:start        date-int-coll?
+                          :stop         date-int-coll?
+                          (ds/opt :gym) boolean?
+                          :exercises    #(and (map? %)
+                                              (sets-reps? %))}])
 
 (def workouts-spec (ds/spec {:spec workouts-spec-data
                              :name ::workouts}))
