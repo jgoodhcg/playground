@@ -50,31 +50,65 @@
        (sp/select [sp/MAP-VALS])
        (every? (fn [srws]
                  (->> srws
-                      (every? (fn [srw] (and (contains? srw :s)
-                                             (or (contains? srw :time)
-                                                 (contains? srw :r))))))))))
+                      (every? (fn [srw]
+                                (and
+                                 (map? srw)
+                                 (contains? srw :s)
+                                 (or (contains? srw :time)
+                                     (contains? srw :r))))))))))
 
-(def workouts-spec-data [{:start [int?]
-                          :stop [int?]
-                          :gym boolean?
+(defn date-int-coll? [c]
+  (and (= 5 (count c))
+       (every? int? c)
+       (-> (first c) (> 2000))
+       (-> (nth c 1) (> 0))
+       (-> (nth c 2) (> 0))
+       (-> (nth c 1) (< 13))
+       (-> (nth c 2) (< 13))))
+
+(def workouts-spec-data [{:start     date-int-coll?
+                          :stop      date-int-coll?
+                          :gym       boolean?
                           :exercises #(and (map? %)
                                            (sets-reps? %))}])
 
 (def workouts-spec (ds/spec {:spec workouts-spec-data
                              :name ::workouts}))
 
-;; (s/valid? workouts-spec sample-data)
-;; (s/explain-data workouts-spec sample-data)
+(def exercises-to-count #{:pullup :pushup :squat})
 
-;; (->> data
-;;      (sp/select [sp/ALL :exercises ]))
+(defn filter-fn [entry]
+  (->> entry
+       :start
+       ((fn [c]
+          (and (-> c first (> 2019))
+               (-> c (nth 1) (> 2)))))))
 
-;; (defn -main [workout-edn-str]
-;;   (let [data                  (clojure.edn/read-string workout-edn-str)
-;;         spec-fail-explanation (s/explain-str workouts-spec data)]
-;;     (if (some? spec-fail-explanation)
-;;       (println spec-fail-explanation)
-;;       (->> data
-;;            (sp/select [sp/ALL :exercises ])))
-;;     ))
+(defn -main [workout-edn-str]
+  (let [data                  (clojure.edn/read-string workout-edn-str)
+        spec-fail-explanation (s/explain-str workouts-spec data)]
+    (if (not (= "Success!\n" spec-fail-explanation))
+      (println spec-fail-explanation)
+      (println
+       (->> data
+            ;; since march 2020
+            (filter filter-fn)
+            ;; all the exercises
+            (sp/select [sp/ALL :exercises sp/ALL
+                        (fn [exercise]
+                          (some? (some exercises-to-count
+                                       exercise)))])
+            ;; group by exercise
+            (group-by first)
 
+            ;; do some cleanup magic
+            ;; calculate total reps for each exercises-to-count
+            (sp/transform [sp/MAP-VALS sp/ALL] rest)
+            (sp/transform [sp/MAP-VALS]
+                          (fn [srws]
+                            (->> srws
+                                 flatten
+                                 (map (fn [{:keys [s r]}]
+                                        (* s r)))
+                                 (reduce +))))
+            str)))))
