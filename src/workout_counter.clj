@@ -87,10 +87,8 @@
           (and (-> c first (> 2019))
                (-> c (nth 1) (> 2)))))))
 
-;; Invoke with
-;; clj -m workout-counter "$(cat ~/Nextcloud/gsd/workouts.edn)"
-(defn -main [workout-edn-str]
-  (let [data                  (clojure.edn/read-string workout-edn-str)
+(defn process [workout-edn-str]
+  (let [data                    (clojure.edn/read-string workout-edn-str)
         spec-fail-explanation (s/explain-str workouts-spec data)]
     (if (not (= "Success!\n" spec-fail-explanation))
       (println spec-fail-explanation)
@@ -117,3 +115,10 @@
                                         (* s r)))
                                  (reduce +))))
             str)))))
+
+;; Invoke with
+;; clj -m workout-counter "$(cat ~/Nextcloud/gsd/workouts.edn)"
+(defn -main [file-path]
+  (->> file-path
+       (slurp)
+       (process)))
