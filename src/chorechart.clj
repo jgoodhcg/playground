@@ -135,6 +135,7 @@
                                    (count)
                                    (+ 1))]
                           (merge entry {:cumulative cumulative}))))
+         (map #(dissoc % :chore :id))
          ;; (filter #(-> %
          ;;              (:date)
          ;;              (time-format/parse)
