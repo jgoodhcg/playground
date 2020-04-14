@@ -1,6 +1,10 @@
 (ns chorechart
   (:require [oz.core :as oz]
             [clojure.data.json :as json]
+            [clj-time.core :as time]
+            [clj-time.format :as time-format]
+            [clj-time.coerce :as time-coerce]
+            [clj-time.predicates :as time-pred]
             [com.rpl.specter :as sp]
             [clj-http.client :as http]))
 
@@ -20,7 +24,6 @@
 
 ;; Render the plot
 (oz/view! line-plot)
-
 
 (defn get-chores! [db-id key]
   (loop [response (-> (http/get
@@ -103,7 +106,6 @@
        (flatten)
        (sort-by :date)))
 
-
 (def chores-by-month {:data   {:values chores-by-month-data}
                       :encoding {:x     {:field "date" :type "nominal"}
                                  :y     {:field "count" :type "quantitative"}
@@ -111,3 +113,38 @@
                       :mark     "bar"})
 
 (oz/view! chores-by-month)
+
+(def chores-cumulative-data
+  (let [sorted (->> chores-raw
+                    (sp/transform
+                     [sp/ALL]
+                     (fn [{:keys [id fields]}]
+                       {:id     id
+                        :date   (:Date fields)
+                        :chore  (:Chore fields)
+                        :person (:Person fields)}))
+                    ;; (remove #(-> % (:chore) (= "Dishes")))
+                    (sort-by #(time-coerce/to-long (:date %))))]
+    (->> sorted
+         (map-indexed (fn [index {:keys [person] :as entry}]
+                        (let [cumulative
+                              (->> sorted
+                                   (map-indexed (fn [i e] {:i i :e e}))
+                                   (filter #(-> % :i (< index)))
+                                   (filter #(-> % :e :person (= person)))
+                                   (count)
+                                   (+ 1))]
+                          (merge entry {:cumulative cumulative}))))
+         ;; (filter #(-> %
+         ;;              (:date)
+         ;;              (time-format/parse)
+         ;;              (time-pred/weekend?)))
+         )))
+
+(def chores-cumulative {:data     {:values chores-cumulative-data}
+                        :encoding {:x     {:field "date" :type "nominal"}
+                                   :y     {:field "cumulative" :type "quantitative"}
+                                   :color {:field "person" :type "nominal"}}
+                        :mark     "line"})
+
+(oz/view! chores-cumulative)
