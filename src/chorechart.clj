@@ -1,12 +1,14 @@
 (ns chorechart
-  (:require [oz.core :as oz]
-            [clojure.data.json :as json]
-            [clj-time.core :as time]
-            [clj-time.format :as time-format]
-            [clj-time.coerce :as time-coerce]
-            [clj-time.predicates :as time-pred]
-            [com.rpl.specter :as sp]
-            [clj-http.client :as http]))
+  (:require
+   [secrets :as secrets]
+   [oz.core :as oz]
+   [clojure.data.json :as json]
+   [clj-time.core :as time]
+   [clj-time.format :as time-format]
+   [clj-time.coerce :as time-coerce]
+   [clj-time.predicates :as time-pred]
+   [com.rpl.specter :as sp]
+   [clj-http.client :as http]))
 
 (oz/start-server!)
 
@@ -49,7 +51,7 @@
              (json/read-str :key-fn keyword))
          (concat chores (->> response :records)))))))
 
-(def chores-raw (get-chores! "app0ASuEp9abRqV2v" "keyuu0VR2QuX2RMJf"))
+(def chores-raw (get-chores! "app0ASuEp9abRqV2v" secrets/airtable-chores-api-key))
 
 (def chores-by-day-data
   (->> chores-raw
