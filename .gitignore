@@ -4,3 +4,5 @@
 .nrepl-port
 
 src/secrets.clj
+
+resources/ideas-Grid view.csv
