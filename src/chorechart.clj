@@ -18,38 +18,38 @@
     {:time i :item n :quantity (+ (Math/pow (* i (count n)) 0.8) (rand-int (count n)))}))
 
 (def line-plot
-  {:data {:values (play-data "monkey" "slipper" "broom")}
-   :encoding {:x {:field "time" :type "quantitative"}
-              :y {:field "quantity" :type "quantitative"}
+  {:data     {:values (play-data "monkey" "slipper" "broom")}
+   :encoding {:x     {:field "time" :type "quantitative"}
+              :y     {:field "quantity" :type "quantitative"}
               :color {:field "item" :type "nominal"}}
-   :mark "line"})
+   :mark     "line"})
 
 ;; Render the plot
 (oz/view! line-plot)
 
 (defn get-chores! [db-id key]
   (loop [response (-> (http/get
-                       (str
-                        "https://api.airtable.com/v0/"
-                        db-id
-                        "/Chores")
-                       {:headers {:authorization (str "Bearer " key)}})
+                        (str
+                          "https://api.airtable.com/v0/"
+                          db-id
+                          "/Chores")
+                        {:headers {:authorization (str "Bearer " key)}})
                       (:body)
                       (json/read-str :key-fn keyword))
-         chores    []]
+         chores   []]
     (let [offset (->> response :offset)]
       (if (nil? offset)
         (concat chores (->> response :records))
         (recur
-         (-> (http/get
-              (str
-               "https://api.airtable.com/v0/"
-               db-id
-               "/Chores?offset="offset)
-              {:headers {:authorization (str "Bearer " key)}})
-             (:body)
-             (json/read-str :key-fn keyword))
-         (concat chores (->> response :records)))))))
+          (-> (http/get
+                (str
+                  "https://api.airtable.com/v0/"
+                  db-id
+                  "/Chores?offset=" offset)
+                {:headers {:authorization (str "Bearer " key)}})
+              (:body)
+              (json/read-str :key-fn keyword))
+          (concat chores (->> response :records)))))))
 
 (def chores-raw (get-chores! "app0ASuEp9abRqV2v" secrets/airtable-chores-api-key))
 
@@ -108,7 +108,7 @@
        (flatten)
        (sort-by :date)))
 
-(def chores-by-month {:data   {:values chores-by-month-data}
+(def chores-by-month {:data     {:values chores-by-month-data}
                       :encoding {:x     {:field "date" :type "nominal"}
                                  :y     {:field "count" :type "quantitative"}
                                  :color {:field "person" :type "nominal"}}
@@ -119,12 +119,12 @@
 (def chores-cumulative-data
   (let [sorted (->> chores-raw
                     (sp/transform
-                     [sp/ALL]
-                     (fn [{:keys [id fields]}]
-                       {:id     id
-                        :date   (:Date fields)
-                        :chore  (:Chore fields)
-                        :person (:Person fields)}))
+                      [sp/ALL]
+                      (fn [{:keys [id fields]}]
+                        {:id     id
+                         :date   (:Date fields)
+                         :chore  (:Chore fields)
+                         :person (:Person fields)}))
                     ;; (remove #(-> % (:chore) (= "Dishes")))
                     (sort-by #(time-coerce/to-long (:date %))))]
     (->> sorted
