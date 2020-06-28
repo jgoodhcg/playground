@@ -30,6 +30,17 @@
   (doall
     (->> rdr
          (line-seq)
-         (partition-by (fn [s] (s/valid? ::day-heading (-> (clojure.string/split s #",")))))
+         (map #(clojure.string/split % #","))
+         (partition-by (fn [s] (s/valid? ::day-heading s)))
          (drop 1)
+         (reduce
+           (fn [data i]
+             (let [item           (first i)
+                   maybe-day-data (s/conform ::day-heading item)]
+               (if (not= :clojure.spec.alpha/invalid maybe-day-data)
+                 (conj data (merge maybe-day-data
+                                   {:meals []}))
+                 data
+                 )))
+           [])
          )))
