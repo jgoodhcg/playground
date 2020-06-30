@@ -6,6 +6,10 @@
 
 (def meal-heading-example " Breakfast,4,0.5,0,0,0,0,0,15,0,")
 
+(def item-heading-example-a "  Stanley Brothers Charlotte's Web (Cbd Oil),4,0.5,,0,,,0,,,")
+
+(def item-heading-example-b "  Morningstar Farms Maple Flavored Sausage Patties,240,9,0,15,3,6,24,750,0,315")
+
 (defn blank-or-float? [v]
   (or (= v "")
       (some? (try (Float/parseFloat v)
@@ -44,6 +48,13 @@
     :chol blank-or-float?
     :potassium (s/? blank-or-float?)))
 
+(-> item-heading-example-a (clojure.string/split #","))
+(-> item-heading-example-b (clojure.string/split #","))
+
+(s/def ::item-heading )
+
+(def last-meal-edited nil)
+
 (with-open [rdr (clojure.java.io/reader "/home/justin/Desktop/Food Diary May 2019.eml")]
   (doall
     (->> rdr
@@ -57,19 +68,42 @@
                  (conj data (merge maybe-day-data
                                    {:meals {}}))
                  (if (not= :clojure.spec.alpha/invalid maybe-meal-data)
-                   ;; use specter to transform the last element in data to add the meals to that day
-                   (->> data
-                        (sp/transform
-                          [sp/LAST :meals]
-                          (fn [meals]
-                            (assoc meals (-> maybe-meal-data
-                                             (:meal)
-                                             (clojure.string/trim)
-                                             (clojure.string/lower-case)
-                                             (clojure.string/replace #"/" "-")
-                                             (keyword))
-                                   (merge maybe-meal-data {:items []})))))
-                   data)
+                   (let [meal-keyword (-> maybe-meal-data
+                                          (:meal)
+                                          (clojure.string/trim)
+                                          (clojure.string/lower-case)
+                                          (clojure.string/replace #"/" "-")
+                                          (keyword))]
+                     ;; some brittle state
+                     (reset! last-meal-edited meal-keyword)
+
+                     ;; use specter to transform the last element in data to add the meals to that day
+                     (->> data
+                          (sp/transform
+                            [sp/LAST :meals meal-keyword]
+                            (fn [meals]
+                              (assoc meals
+                                     (merge maybe-meal-data {:items []}))))))
+
+                   ;; TODO figure out all these values
+                   (let [maybe-item-heading false ;; does it have commas and no quotes?
+                         maybe-item-amount  false ;; does it have quotes and " x "?
+                         maybe-meal-data    {}    ;; needs to be padded with zeros on the end
+                         ]
+                     (if maybe-item-heading
+                       (->> data
+                            (sp/transform
+                              [sp/LAST :meals @last-meal-edited :items]
+                              (fn [meal-items]
+                                (conj meal-items maybe-meal-data))))
+                       (if maybe-item-amount
+                         (->> data
+                              (sp/transform
+                                [sp/LAST :meals @last-meal-edited :items sp/LAST]
+                                (fn [meal-item]
+                                  ;; just use the raw string
+                                  (assoc meal-item {:amount item}))))
+                         data))))
                  )))
            [])
          )))
