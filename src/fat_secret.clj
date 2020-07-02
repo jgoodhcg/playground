@@ -86,6 +86,8 @@
     x
     (merge zero-out-blank x)))
 
+(def args-num (atom []))
+
 (with-open [rdr (clojure.java.io/reader "/home/justin/Desktop/Food Diary May 2019.eml")]
   (doall
     (->> rdr
@@ -118,17 +120,16 @@
                      (->> data
                           (sp/transform
                             [sp/LAST :meals meal-keyword]
-                            (fn [meals]
-                              (assoc meals
-                                     (merge maybe-meal-data {:items []}))))))
+                            (fn [meal]
+                              (merge maybe-meal-data {:items []})))))
                    ;; now it's either an item or an item amount
                    (let [is-item-heading (-> item
                                              (clojure.string/includes? ",")
-                                             (#(and (not (clojure.string/includes? % "\""))))
-                                             (#(and (not= :clojure.spec.alpha/invalid maybe-item-data))))
+                                             (and (not (clojure.string/includes? item "\"")))
+                                             (and (not= :clojure.spec.alpha/invalid maybe-item-data)))
                          is-item-amount  (-> item
                                              (clojure.string/includes? ",")
-                                             (#(and (not (clojure.string/includes? % "\"")))))]
+                                             (and (not (clojure.string/includes? item "\""))))]
                      (if is-item-heading
                        (->> data
                             (sp/transform
@@ -141,8 +142,7 @@
                                 [sp/LAST :meals @last-meal-edited :items sp/LAST]
                                 (fn [meal-item]
                                   ;; just use the raw string
-                                  (assoc meal-item {:amount item}))))
-                         data))))
-                 )))
+                                  (assoc meal-item :amount item))))
+                         data)))))))
            [])
          )))
