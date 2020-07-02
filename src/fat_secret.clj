@@ -120,16 +120,15 @@
                      (->> data
                           (sp/transform
                             [sp/LAST :meals meal-keyword]
-                            (fn [meal]
+                            (fn [_]
                               (merge maybe-meal-data {:items []})))))
                    ;; now it's either an item or an item amount
                    (let [is-item-heading (-> item
-                                             (clojure.string/includes? ",")
-                                             (and (not (clojure.string/includes? item "\"")))
-                                             (and (not= :clojure.spec.alpha/invalid maybe-item-data)))
+                                             (count)
+                                             (> 2))
                          is-item-amount  (-> item
-                                             (clojure.string/includes? ",")
-                                             (and (not (clojure.string/includes? item "\""))))]
+                                             (count)
+                                             (<= 2))]
                      (if is-item-heading
                        (->> data
                             (sp/transform
@@ -141,7 +140,7 @@
                               (sp/transform
                                 [sp/LAST :meals @last-meal-edited :items sp/LAST]
                                 (fn [meal-item]
-                                  ;; just use the raw string
+                                  ;; just use the raw item
                                   (assoc meal-item :amount item))))
                          data)))))))
            [])
