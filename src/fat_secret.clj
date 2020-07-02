@@ -15,6 +15,7 @@
       (some? (try (Float/parseFloat v)
                   (catch NumberFormatException e nil)))))
 
+;; TODO Why can't I use `(apply s/cat [:list of :keys and :pred icates])` ???
 (s/def ::day-heading
   (s/cat
     :day-of-week #{"\"Monday" "\"Tuesday" "\"Wednesday" "\"Thursday" "\"Friday" "\"Saturday" "\"Sunday"}
@@ -22,38 +23,68 @@
     :year #(re-matches #"^\s{1}[0-9]{4}\"" %)
 
     ;; should check on the order in the export sheet before trusting this
-    :cals blank-or-float?
-    :fat blank-or-float?
-    :sat blank-or-float?
-    :carbs blank-or-float?
-    :fiber blank-or-float?
-    :sugar blank-or-float?
-    :prot blank-or-float?
-    :sod blank-or-float?
-    :chol blank-or-float?
-    :potassium blank-or-float?))
+    :cals (s/? blank-or-float?)
+    :fat (s/? blank-or-float?)
+    :sat (s/? blank-or-float?)
+    :carbs (s/? blank-or-float?)
+    :fiber (s/? blank-or-float?)
+    :sugar (s/? blank-or-float?)
+    :prot (s/? blank-or-float?)
+    :sod (s/? blank-or-float?)
+    :chol (s/? blank-or-float?)
+    :potassium (s/? blank-or-float?)))
 
 (s/def ::meal-heading
   (s/cat
     :meal #{" Breakfast" " Lunch" " Dinner" " Snacks/Other"}
     ;; should check on the order in the export sheet before trusting this
-    :cals blank-or-float?
-    :fat blank-or-float?
-    :sat blank-or-float?
-    :carbs blank-or-float?
-    :fiber blank-or-float?
-    :sugar blank-or-float?
-    :prot blank-or-float?
-    :sod blank-or-float?
-    :chol blank-or-float?
+    :cals (s/? blank-or-float?)
+    :fat (s/? blank-or-float?)
+    :sat (s/? blank-or-float?)
+    :carbs (s/? blank-or-float?)
+    :fiber (s/? blank-or-float?)
+    :sugar (s/? blank-or-float?)
+    :prot (s/? blank-or-float?)
+    :sod (s/? blank-or-float?)
+    :chol (s/? blank-or-float?)
     :potassium (s/? blank-or-float?)))
 
 (-> item-heading-example-a (clojure.string/split #","))
+
 (-> item-heading-example-b (clojure.string/split #","))
 
-(s/def ::item-heading )
+(s/def ::item-heading
+  (s/cat
+    :description string?
+    ;; should check on the order in the export sheet before trusting this
+    :cals (s/? blank-or-float?)
+    :fat (s/? blank-or-float?)
+    :sat (s/? blank-or-float?)
+    :carbs (s/? blank-or-float?)
+    :fiber (s/? blank-or-float?)
+    :sugar (s/? blank-or-float?)
+    :prot (s/? blank-or-float?)
+    :sod (s/? blank-or-float?)
+    :chol (s/? blank-or-float?)
+    :potassium (s/? blank-or-float?)))
 
-(def last-meal-edited nil)
+(def last-meal-edited (atom nil))
+
+(def zero-out-blank {:cals      "0"
+                     :fat       "0"
+                     :sat       "0"
+                     :carbs     "0"
+                     :fiber     "0"
+                     :sugar     "0"
+                     :prot      "0"
+                     :sod       "0"
+                     :chol      "0"
+                     :potassium "0"})
+
+(defn zero-out [x]
+  (if (= :clojure.spec.alpha/invalid)
+    x
+    (merge zero-out-blank x)))
 
 (with-open [rdr (clojure.java.io/reader "/home/justin/Desktop/Food Diary May 2019.eml")]
   (doall
@@ -62,12 +93,18 @@
          (map #(clojure.string/split % #","))
          (reduce
            (fn [data item]
-             (let [maybe-day-data  (s/conform ::day-heading item)
-                   maybe-meal-data (s/conform ::meal-heading item)]
+             (let [maybe-day-data  (zero-out (s/conform ::day-heading item))
+                   maybe-meal-data (zero-out (s/conform ::meal-heading item))
+                   maybe-item-data (zero-out (s/conform ::item-heading item))]
+
+               ;; when it is a day
                (if (not= :clojure.spec.alpha/invalid maybe-day-data)
+                 ;; build out the day and leave meals empty
                  (conj data (merge maybe-day-data
                                    {:meals {}}))
+                 ;; otherwise check if it's a meal
                  (if (not= :clojure.spec.alpha/invalid maybe-meal-data)
+                   ;; when it is then build out the meal data and leave items empty
                    (let [meal-keyword (-> maybe-meal-data
                                           (:meal)
                                           (clojure.string/trim)
@@ -84,19 +121,21 @@
                             (fn [meals]
                               (assoc meals
                                      (merge maybe-meal-data {:items []}))))))
-
-                   ;; TODO figure out all these values
-                   (let [maybe-item-heading false ;; does it have commas and no quotes?
-                         maybe-item-amount  false ;; does it have quotes and " x "?
-                         maybe-meal-data    {}    ;; needs to be padded with zeros on the end
-                         ]
-                     (if maybe-item-heading
+                   ;; now it's either an item or an item amount
+                   (let [is-item-heading (-> item
+                                             (clojure.string/includes? ",")
+                                             (#(and (not (clojure.string/includes? % "\""))))
+                                             (#(and (not= :clojure.spec.alpha/invalid maybe-item-data))))
+                         is-item-amount  (-> item
+                                             (clojure.string/includes? ",")
+                                             (#(and (not (clojure.string/includes? % "\"")))))]
+                     (if is-item-heading
                        (->> data
                             (sp/transform
                               [sp/LAST :meals @last-meal-edited :items]
                               (fn [meal-items]
-                                (conj meal-items maybe-meal-data))))
-                       (if maybe-item-amount
+                                (conj meal-items maybe-item-data))))
+                       (if is-item-amount
                          (->> data
                               (sp/transform
                                 [sp/LAST :meals @last-meal-edited :items sp/LAST]
