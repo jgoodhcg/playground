@@ -1,6 +1,7 @@
 (ns fat-secret
   (:require [clojure.spec.alpha :as s]
-            [com.rpl.specter :as sp]))
+            [com.rpl.specter :as sp]
+            [debux.core :refer :all]))
 
 (def day-heading-example "\"Saturday, June 1, 2019\",2614,112.19,56.411,199.95,24.4,35.59,114.91,2850,130,1961")
 
@@ -121,30 +122,29 @@
                             (fn [_]
                               (merge maybe-meal-data {:items []})))))
                    ;; now it's either an item or an item amount
-                   (let [is-item-heading (-> item
-                                             (count)
-                                             (> 2))
-                         is-item-amount  (-> item
-                                             (count)
-                                             (<= 2))]
+                   (let [is-item-heading   (-> item
+                                               (count)
+                                               (> 2))
+                         is-item-amount    (-> item
+                                               (count)
+                                               (<= 2))
+                         prev-meal-keyword @last-meal-edited]
 
-                     (if is-item-heading
+                     (if (and is-item-heading
+                              (not= :clojure.spec.alpha/invalid maybe-item-data))
                        (->> data
                             (sp/transform
-                              [sp/LAST :meals @last-meal-edited]
+                              [sp/LAST :meals prev-meal-keyword :items]
                               ;; :items]
                               (fn [meal-items]
-                                (println meal-items)
-                                meal-items
-                                ;;(conj meal-items maybe-item-data)
-                                )))
+                                (conj meal-items maybe-item-data))))
                        (if is-item-amount
                          (->> data
                               (sp/transform
-                                [sp/LAST :meals @last-meal-edited :items sp/LAST]
+                                [sp/LAST :meals prev-meal-keyword :items sp/LAST]
                                 (fn [meal-item]
                                   ;; just use the raw item
-                                  (assoc meal-item :amount item))))
+                                  (merge meal-item {:amount item}))))
                          data)))))))
            [])
          )))
