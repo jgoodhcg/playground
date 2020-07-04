@@ -10,5 +10,6 @@
          org.clojure/data.csv  {:mvn/version "0.1.4"}
          org.clojure/data.json {:mvn/version "0.2.7"}
          redux                 {:mvn/version "0.1.4"}
-         semantic-csv          {:mvn/version "0.2.1-alpha1"}}
+         semantic-csv          {:mvn/version "0.2.1-alpha1"}
+         philoskim/debux       {:mvn/version "0.7.3"}}
  :paths ["src" "resources"]}
