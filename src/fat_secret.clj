@@ -10,25 +10,10 @@
 
 (def item-heading-example-b "  Morningstar Farms Maple Flavored Sausage Patties,240,9,0,15,3,6,24,750,0,315")
 
-(-> item-heading-example-a (clojure.string/split #","))
-(-> item-heading-example-b (clojure.string/split #",") (count))
 (defn blank-or-float? [v]
   (or (= v "")
       (some? (try (Float/parseFloat v)
                   (catch NumberFormatException e nil)))))
-
-;; (def sub-spec [:cals (s/? blank-or-float?)
-;;                :fat (s/? blank-or-float?)
-;;                :sat (s/? blank-or-float?)
-;;                :carbs (s/? blank-or-float?)
-;;                :fiber (s/? blank-or-float?)
-;;                :sugar (s/? blank-or-float?)
-;;                :prot (s/? blank-or-float?)
-;;                :sod (s/? blank-or-float?)
-;;                :chol (s/? blank-or-float?)
-;;                :potassium (s/? blank-or-float?)])
-
-;; (macroexpand-1 `(def more-spec ~@sub-spec))
 
 ;; TODO Why can't I use `(apply s/cat [:list of :keys and :pred icates])` ???
 (s/def ::day-heading
