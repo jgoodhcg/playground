@@ -10,10 +10,25 @@
 
 (def item-heading-example-b "  Morningstar Farms Maple Flavored Sausage Patties,240,9,0,15,3,6,24,750,0,315")
 
+(-> item-heading-example-a (clojure.string/split #","))
+(-> item-heading-example-b (clojure.string/split #",") (count))
 (defn blank-or-float? [v]
   (or (= v "")
       (some? (try (Float/parseFloat v)
                   (catch NumberFormatException e nil)))))
+
+;; (def sub-spec [:cals (s/? blank-or-float?)
+;;                :fat (s/? blank-or-float?)
+;;                :sat (s/? blank-or-float?)
+;;                :carbs (s/? blank-or-float?)
+;;                :fiber (s/? blank-or-float?)
+;;                :sugar (s/? blank-or-float?)
+;;                :prot (s/? blank-or-float?)
+;;                :sod (s/? blank-or-float?)
+;;                :chol (s/? blank-or-float?)
+;;                :potassium (s/? blank-or-float?)])
+
+;; (macroexpand-1 `(def more-spec ~@sub-spec))
 
 ;; TODO Why can't I use `(apply s/cat [:list of :keys and :pred icates])` ???
 (s/def ::day-heading
@@ -32,7 +47,8 @@
     :prot (s/? blank-or-float?)
     :sod (s/? blank-or-float?)
     :chol (s/? blank-or-float?)
-    :potassium (s/? blank-or-float?)))
+    :potassium (s/? blank-or-float?)
+    ))
 
 (s/def ::meal-heading
   (s/cat
@@ -48,8 +64,6 @@
     :sod (s/? blank-or-float?)
     :chol (s/? blank-or-float?)
     :potassium (s/? blank-or-float?)))
-
-(-> item-heading-example-a (clojure.string/split #","))
 
 (-> item-heading-example-b (clojure.string/split #","))
 
@@ -86,8 +100,6 @@
     x
     (merge zero-out-blank x)))
 
-(def args-num (atom []))
-
 (with-open [rdr (clojure.java.io/reader "/home/justin/Desktop/Food Diary May 2019.eml")]
   (doall
     (->> rdr
@@ -113,6 +125,7 @@
                                           (clojure.string/lower-case)
                                           (clojure.string/replace #"/" "-")
                                           (keyword))]
+
                      ;; some brittle state
                      (reset! last-meal-edited meal-keyword)
 
@@ -129,12 +142,17 @@
                          is-item-amount  (-> item
                                              (count)
                                              (<= 2))]
+
                      (if is-item-heading
                        (->> data
                             (sp/transform
-                              [sp/LAST :meals @last-meal-edited :items]
+                              [sp/LAST :meals @last-meal-edited]
+                              ;; :items]
                               (fn [meal-items]
-                                (conj meal-items maybe-item-data))))
+                                (println meal-items)
+                                meal-items
+                                ;;(conj meal-items maybe-item-data)
+                                )))
                        (if is-item-amount
                          (->> data
                               (sp/transform
