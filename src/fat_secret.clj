@@ -116,15 +116,20 @@
                                           (keyword))]
 
                      ;; some brittle state
+                     ;; saves the the meal keyword, :breakfast :lunch ... , for the next line processing
+                     ;; the next line will either be a meal item that should go into the saved meal or a new meal
                      (reset! last-meal-edited meal-keyword)
 
-                     ;; use specter to transform the last element in data to add the meals to that day
+                     ;; use specter to transform the last day in data to add the meal
                      (->> data
                           (sp/transform
                             [sp/LAST :meals meal-keyword]
                             (fn [_]
                               (merge maybe-meal-data {:items []})))))
-                   ;; now it's either an item or an item amount
+
+                   ;; if the line has fallen through this far then
+                   ;; it's either an item or an item amount
+                   ;; we can do some loose counting that should be write most of the time
                    (let [is-item-heading   (-> item
                                                (count)
                                                (> 2))
@@ -135,12 +140,21 @@
 
                      (if (and is-item-heading
                               (valid-conform? maybe-item-data))
+                       ;; when it is a meal-item then add it to the last day's last meal's :items list
+                       ;; there are some lines that might be misinterpreted by this loose conform
+                       ;; those are all in the beginning of the document before a valid day
+                       ;; data should be empty until a valid day is reached
+                       ;; sp/transform won't add anything until all the levels above :items are valid
                        (->> data
                             (sp/transform
                               [sp/LAST :meals prev-meal-keyword :items]
-                              ;; :items]
                               (fn [meal-items]
                                 (conj meal-items maybe-item-data))))
+                       ;; when it is an item amount then add the :amount key to the last item from the last meal edited on the last day in the list
+                       ;; there are some lines that might be misinterpreted by this loose conform
+                       ;; those are all in the beginning of the document before a valid day
+                       ;; data should be empty until a valid day is reached
+                       ;; sp/transform won't add anything until all the levels above :items LAST are valid
                        (if is-item-amount
                          (->> data
                               (sp/transform
@@ -148,6 +162,11 @@
                                 (fn [meal-item]
                                   ;; just use the raw item
                                   (merge meal-item {:amount item}))))
-                         data)))))))
+                         ;; if it isn't a day, meal, meal-item, or meal-item-amount then it is we shouldn't do anything with it
+                         (do
+                           (println "Following line was not a day, meal, item, or amount")
+                           (println item)
+                           (println)
+                           data))))))))
            [])
          )))
