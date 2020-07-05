@@ -70,21 +70,24 @@
 
 (def last-meal-edited (atom nil))
 
-(def zero-out-blank {:cals      "0"
-                     :fat       "0"
-                     :sat       "0"
-                     :carbs     "0"
-                     :fiber     "0"
-                     :sugar     "0"
-                     :prot      "0"
-                     :sod       "0"
-                     :chol      "0"
-                     :potassium "0"})
+(def zero-fill-blank {:cals      "0"
+                      :fat       "0"
+                      :sat       "0"
+                      :carbs     "0"
+                      :fiber     "0"
+                      :sugar     "0"
+                      :prot      "0"
+                      :sod       "0"
+                      :chol      "0"
+                      :potassium "0"})
 
-(defn zero-out [x]
-  (if (= :clojure.spec.alpha/invalid)
-    x
-    (merge zero-out-blank x)))
+(defn valid-conform? [x]
+  (not= :clojure.spec.alpha/invalid x))
+
+(defn zero-fill [x]
+  (if (valid-conform? x)
+    (merge zero-fill-blank x)
+    x))
 
 (with-open [rdr (clojure.java.io/reader "/home/justin/Desktop/Food Diary May 2019.eml")]
   (doall
@@ -93,17 +96,17 @@
          (map #(clojure.string/split % #","))
          (reduce
            (fn [data item]
-             (let [maybe-day-data  (zero-out (s/conform ::day-heading item))
-                   maybe-meal-data (zero-out (s/conform ::meal-heading item))
-                   maybe-item-data (zero-out (s/conform ::item-heading item))]
+             (let [maybe-day-data  (->> item (s/conform ::day-heading) (zero-fill))
+                   maybe-meal-data (->> item (s/conform ::meal-heading) (zero-fill))
+                   maybe-item-data (->> item (s/conform ::item-heading) (zero-fill))]
 
                ;; when it is a day
-               (if (not= :clojure.spec.alpha/invalid maybe-day-data)
+               (if (valid-conform? maybe-day-data)
                  ;; build out the day and leave meals empty
                  (conj data (merge maybe-day-data
                                    {:meals {}}))
                  ;; otherwise check if it's a meal
-                 (if (not= :clojure.spec.alpha/invalid maybe-meal-data)
+                 (if (valid-conform? maybe-meal-data)
                    ;; when it is then build out the meal data and leave items empty
                    (let [meal-keyword (-> maybe-meal-data
                                           (:meal)
@@ -131,7 +134,7 @@
                          prev-meal-keyword @last-meal-edited]
 
                      (if (and is-item-heading
-                              (not= :clojure.spec.alpha/invalid maybe-item-data))
+                              (valid-conform? maybe-item-data))
                        (->> data
                             (sp/transform
                               [sp/LAST :meals prev-meal-keyword :items]
