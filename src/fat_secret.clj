@@ -186,19 +186,19 @@
                                  (str/trim "\"")
                                  (str/trim))))))
 
+
 (def line-plot
-  {:data     {:values data}
-   :encoding {:x   {:field "month-day" :type "temporal"}
-              :y   {:field "cals" :type "quantitative"}
-              ;; :color {:field "carbs" :type "nominal"}
-              :row {:field "year" :type "nominal"}
-              }
-   :mark     "line"
-   ;; :layer    [
-   ;;         ;; {:mark     "rule"
-   ;;         ;;  :encoding {:y {:field "cals" :type "quantitative" :aggregate "mean"}}}
-   ;;         ]
-   })
+  {:data  {:values data}
+   :width 1000
+   :facet {:row {:field "year" :type "nominal"}}
+   :spec  {:layer [{:encoding {
+                               :x {:field "month-day" :type "temporal"}
+                               :y {:field "cals" :type "quantitative"}
+                               ;; :color {:field "carbs" :type "nominal"}
+                               }
+                    :mark     "line"}
+                   {:mark     "rule"
+                    :encoding {:y {:field "cals" :type "quantitative" :aggregate "mean"}}}]}})
 
 (def viz
   [:div
