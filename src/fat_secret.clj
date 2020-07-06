@@ -181,21 +181,23 @@
   (->> files
        (map parse-detailed-export)
        (flatten)
-       (sp/transform [sp/ALL :year]
-                     (fn [s] (-> s
-                                 (str/trim "\"")
-                                 (str/trim))))))
-
+       (sp/transform [sp/ALL]
+                     (fn [{:keys [year month-day] :as day-item}]
+                       (let [clean-year      (-> year
+                                                 (str/trim "\"")
+                                                 (str/trim))
+                             clean-month-day (-> month-day
+                                                 (str/trim))]
+                         (merge day-item {:year      clean-year
+                                          :month-day clean-month-day
+                                          :date      (str/istr "~{clean-month-day}, ~{clean-year}")}))))))
 
 (def line-plot
   {:data  {:values data}
    :facet {:row {:field "year" :type "nominal"}}
    :spec  {:width 1500
-           :layer [{:encoding {
-                               :x {:field "month-day" :type "temporal"}
-                               :y {:field "cals" :type "quantitative"}
-                               ;; :color {:field "carbs" :type "nominal"}
-                               }
+           :layer [{:encoding {:x {:field "date" :type "temporal"}
+                               :y {:field "cals" :type "quantitative"}}
                     :mark     "line"}
                    {:mark     "rule"
                     :encoding {:y {:field "cals" :type "quantitative" :aggregate "mean"}}}]}})
