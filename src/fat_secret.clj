@@ -189,9 +189,9 @@
 
 (def line-plot
   {:data  {:values data}
-   :width 1000
    :facet {:row {:field "year" :type "nominal"}}
-   :spec  {:layer [{:encoding {
+   :spec  {:width 1500
+           :layer [{:encoding {
                                :x {:field "month-day" :type "temporal"}
                                :y {:field "cals" :type "quantitative"}
                                ;; :color {:field "carbs" :type "nominal"}
