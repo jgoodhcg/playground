@@ -192,7 +192,7 @@
                                           :month-day clean-month-day
                                           :date      (str/istr "~{clean-month-day}, ~{clean-year}")}))))))
 
-(def line-plot
+(def calories-line-plot
   {:data  {:values data}
    :facet {:row {:field "year" :type "nominal"}}
    :spec  {:width 1500
@@ -202,12 +202,25 @@
                    {:mark     "rule"
                     :encoding {:y {:field "cals" :type "quantitative" :aggregate "mean"}}}]}})
 
+(def macro-line-plot
+  {:data   {:values data}
+   ;;   :facet  {:row {:field "year" :type "nominal"}}
+   :repeat {:layer ["prot" "fat" "carbs"]}
+   :spec   {:mark     "line"
+            :encoding {:x     {:field "date" :type "temporal"}
+                       :y     {:field {:repeat "layer" } :type "quantitative"}
+                       :color {:datum {:repeat "layer" :type "nominal"}}}
+            }})
+
 (def viz
   [:div
    [:h1 "Fat Secret Data"]
    [:div
     [:h3 "Calories"]
-    [:vega-lite line-plot]]])
+    [:vega-lite calories-line-plot]]
+   [:div
+    [:h3 "Macros"]
+    [:vega-lite macro-line-plot]]])
 
 ;; Render the plot
 (oz/view! viz)
