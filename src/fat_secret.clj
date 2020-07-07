@@ -202,15 +202,24 @@
                    {:mark     "rule"
                     :encoding {:y {:field "cals" :type "quantitative" :aggregate "mean"}}}]}})
 
+
 (def macro-line-plot
-  {:data   {:values data}
-   ;;   :facet  {:row {:field "year" :type "nominal"}}
-   :repeat {:layer ["prot" "fat" "carbs"]}
-   :spec   {:mark     "line"
-            :encoding {:x     {:field "date" :type "temporal"}
-                       :y     {:field {:repeat "layer" } :type "quantitative"}
-                       :color {:datum {:repeat "layer" :type "nominal"}}}
-            }})
+  {:data  {:values data}
+   :facet {:row {:field "year" :type "nominal"}}
+   :spec  {:width 1500
+           :layer [{:mark     "line"
+                    :encoding {:x     {:field "date" :type "temporal"}
+                               :y     {:field "prot" :type "quantitative"}
+                               :color {:value "red"}}}
+                   {:mark     "line"
+                    :encoding {:x     {:field "date" :type "temporal"}
+                               :y     {:field "fat" :type "quantitative"}
+                               :color {:value "green"}}}
+                   {:mark     "line"
+                    :encoding {:x     {:field "date" :type "temporal"}
+                               :y     {:field "carbs" :type "quantitative"}
+                               :color {:value "grey"}}}
+                   ]}})
 
 (def viz
   [:div
