@@ -7,9 +7,14 @@
 
 (oz/start-server!)
 
-;; file names have an off by 1 error (April is actually May)
-(def files ["/home/justin/Desktop/Food Diary April 2019.eml"
-            "/home/justin/Desktop/Food Diary May 2019.eml"])
+(def files (->> "/home/justin/Nextcloud/projects/quantification-data/raw-data/fat-secret/"
+                (clojure.java.io/file)
+                (file-seq)
+                (filter #(.isFile %))
+                (map #(-> %
+                          (.toPath)
+                          (.toString)))
+                (filter #(str/includes? % "eml"))))
 
 (def day-heading-example "\"Saturday, June 1, 2019\",2614,112.19,56.411,199.95,24.4,35.59,114.91,2850,130,1961")
 
