@@ -200,25 +200,25 @@
 (def calories-line-plot
   {:data  {:values data}
    :width 1700
-   :layer [{:encoding {:x {:field "date" :type "temporal"}
-                       :y {:field "cals" :type "quantitative"}}
-            :mark     "line"}
+   :layer [{:encoding {:x {:field "date" :type "temporal" :timeUnit "yearmonthdate"}
+                       :y {:field "cals" :type "quantitative" :aggregate "mean"}}
+            :mark     "bar"}
            {:mark     "rule"
             :encoding {:y {:field "cals" :type "quantitative" :aggregate "mean"}}}]})
 
 (def macro-line-plot
   {:data  {:values data}
    :width 1700
-   :layer [{:mark     "line"
-            :encoding {:x     {:field "date" :type "temporal"}
+   :layer [{:mark     "bar"
+            :encoding {:x     {:field "date" :type "temporal" :timeUnit "yearmonthdate"}
                        :y     {:field "prot" :type "quantitative"}
                        :color {:value "red"}}}
-           {:mark     "line"
-            :encoding {:x     {:field "date" :type "temporal"}
+           {:mark     "bar"
+            :encoding {:x     {:field "date" :type "temporal" :timeUnit "yearmonthdate"}
                        :y     {:field "fat" :type "quantitative"}
                        :color {:value "green"}}}
-           {:mark     "line"
-            :encoding {:x     {:field "date" :type "temporal"}
+           {:mark     "bar"
+            :encoding {:x     {:field "date" :type "temporal" :timeUnit "yearmonthdate"}
                        :y     {:field "carbs" :type "quantitative"}
                        :color {:value "grey"}}}]})
 
