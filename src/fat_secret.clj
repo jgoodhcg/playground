@@ -201,7 +201,7 @@
   {:data  {:values data}
    :width 1500
    :layer [{:encoding {:x {:field "date" :type "temporal" :timeUnit "week"}
-                       :y {:field "cals" :type "quantitative"}}
+                       :y {:field "cals" :type "quantitative" :aggregate "mean"}}
             :mark     "line"}
            {:mark     "rule"
             :encoding {:y {:field "cals" :type "quantitative" :aggregate "mean"}}}]})
@@ -209,9 +209,10 @@
 (def macro-line-plot
   {:data   {:values data}
    :repeat {:layer ["prot" "fat" "carbs"]}
-   :spec   {:mark     "line"
+   :spec   {:width    1500
+            :mark     "line"
             :encoding {:x     {:field "date" :type "temporal" :timeUnit "week"}
-                       :y     {:field {:repeat "layer" } :type "quantitative"}
+                       :y     {:field {:repeat "layer" } :type "quantitative" :aggregate "mean"}
                        :color {:datum {:repeat "layer" :type "nominal"}}}}})
 
 (def viz
