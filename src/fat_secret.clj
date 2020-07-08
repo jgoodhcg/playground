@@ -194,23 +194,20 @@
 
 (def calories-line-plot
   {:data  {:values data}
-   :facet {:row {:field "year" :type "nominal"}}
-   :spec  {:width 1500
-           :layer [{:encoding {:x {:field "date" :type "temporal"}
-                               :y {:field "cals" :type "quantitative"}}
-                    :mark     "line"}
-                   {:mark     "rule"
-                    :encoding {:y {:field "cals" :type "quantitative" :aggregate "mean"}}}]}})
+   :width 1500
+   :layer [{:encoding {:x {:field "date" :type "temporal" :timeUnit "week"}
+                       :y {:field "cals" :type "quantitative"}}
+            :mark     "line"}
+           {:mark     "rule"
+            :encoding {:y {:field "cals" :type "quantitative" :aggregate "mean"}}}]})
 
 (def macro-line-plot
   {:data   {:values data}
-   ;;   :facet  {:row {:field "year" :type "nominal"}}
    :repeat {:layer ["prot" "fat" "carbs"]}
    :spec   {:mark     "line"
-            :encoding {:x     {:field "date" :type "temporal"}
+            :encoding {:x     {:field "date" :type "temporal" :timeUnit "week"}
                        :y     {:field {:repeat "layer" } :type "quantitative"}
-                       :color {:datum {:repeat "layer" :type "nominal"}}}
-            }})
+                       :color {:datum {:repeat "layer" :type "nominal"}}}}})
 
 (def viz
   [:div
