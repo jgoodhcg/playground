@@ -199,32 +199,28 @@
 
 (def calories-line-plot
   {:data  {:values data}
-   :facet {:row {:field "year" :type "nominal"}}
-   :spec  {:width 1500
-           :layer [{:encoding {:x {:field "date" :type "temporal"}
-                               :y {:field "cals" :type "quantitative"}}
-                    :mark     "line"}
-                   {:mark     "rule"
-                    :encoding {:y {:field "cals" :type "quantitative" :aggregate "mean"}}}]}})
-
+   :width 1700
+   :layer [{:encoding {:x {:field "date" :type "temporal"}
+                       :y {:field "cals" :type "quantitative"}}
+            :mark     "line"}
+           {:mark     "rule"
+            :encoding {:y {:field "cals" :type "quantitative" :aggregate "mean"}}}]})
 
 (def macro-line-plot
   {:data  {:values data}
-   :facet {:row {:field "year" :type "nominal"}}
-   :spec  {:width 1500
-           :layer [{:mark     "line"
-                    :encoding {:x     {:field "date" :type "temporal"}
-                               :y     {:field "prot" :type "quantitative"}
-                               :color {:value "red"}}}
-                   {:mark     "line"
-                    :encoding {:x     {:field "date" :type "temporal"}
-                               :y     {:field "fat" :type "quantitative"}
-                               :color {:value "green"}}}
-                   {:mark     "line"
-                    :encoding {:x     {:field "date" :type "temporal"}
-                               :y     {:field "carbs" :type "quantitative"}
-                               :color {:value "grey"}}}
-                   ]}})
+   :width 1700
+   :layer [{:mark     "line"
+            :encoding {:x     {:field "date" :type "temporal"}
+                       :y     {:field "prot" :type "quantitative"}
+                       :color {:value "red"}}}
+           {:mark     "line"
+            :encoding {:x     {:field "date" :type "temporal"}
+                       :y     {:field "fat" :type "quantitative"}
+                       :color {:value "green"}}}
+           {:mark     "line"
+            :encoding {:x     {:field "date" :type "temporal"}
+                       :y     {:field "carbs" :type "quantitative"}
+                       :color {:value "grey"}}}]})
 
 (def viz
   [:div
