@@ -203,20 +203,25 @@
    :layer [{:mark     {:type "boxplot" :extent "min-max"}
             :encoding {:x {:field    "date"
                            :type     "temporal"
-                           :scale    {:zero false}
                            :timeUnit "yearmonth"
                            :axis     {:labelExpr "[timeFormat(datum.value, '%b'), timeFormat(datum.value, '%m') == '01' ? timeFormat(datum.value, '%Y') : '']"}}
                        :y {:field "cals"
+                           :scale {:zero false}
                            :type  "quantitative"}}}]})
 
 (def macro-line-plot
   {:data   {:values data}
-   :repeat {:layer ["prot" "fat" "carbs"]}
+   :repeat {:layer ["prot" "fat" "carbs" "sugar"]}
    :spec   {:width    1500
             :mark     "line"
-            :encoding {:x     {:field "date" :type "temporal" :timeUnit "week"}
+            :encoding {:x     {:field    "date"
+                               :type     "temporal"
+                               :timeUnit "yearmonth"
+                               :axis     {:labelExpr "[timeFormat(datum.value, '%b'), timeFormat(datum.value, '%m') == '01' ? timeFormat(datum.value, '%Y') : '']"}}
                        :y     {:field {:repeat "layer" } :type "quantitative" :aggregate "mean"}
                        :color {:datum {:repeat "layer" :type "nominal"}}}}})
+
+
 
 (def viz
   [:div
