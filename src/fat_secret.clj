@@ -183,20 +183,19 @@
              [])))))
 
 (def data
-  (time
-    (->> files
-         (map parse-detailed-export)
-         (flatten)
-         (sp/transform [sp/ALL]
-                       (fn [{:keys [year month-day] :as day-item}]
-                         (let [clean-year      (-> year
-                                                   (str/trim "\"")
-                                                   (str/trim))
-                               clean-month-day (-> month-day
-                                                   (str/trim))]
-                           (merge day-item {:year      clean-year
-                                            :month-day clean-month-day
-                                            :date      (str/istr "~{clean-month-day}, ~{clean-year}")})))))))
+  (->> files
+       (map parse-detailed-export)
+       (flatten)
+       (sp/transform [sp/ALL]
+                     (fn [{:keys [year month-day] :as day-item}]
+                       (let [clean-year      (-> year
+                                                 (str/trim "\"")
+                                                 (str/trim))
+                             clean-month-day (-> month-day
+                                                 (str/trim))]
+                         (merge day-item {:year      clean-year
+                                          :month-day clean-month-day
+                                          :date      (str/istr "~{clean-month-day}, ~{clean-year}")}))))))
 
 (def calories-line-plot
   {:data  {:values data}
