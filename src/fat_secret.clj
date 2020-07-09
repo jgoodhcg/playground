@@ -200,21 +200,14 @@
 (def calories-line-plot
   {:data  {:values data}
    :width 1500
-   :layer [{:mark     {:type "point" :filled true}
-            :encoding {:x {:field "date" :type "temporal" :timeUnit "week"}
-                       :y {:field     "cals"
-                           :type      "quantitative"
-                           :scale     {:zero false}
-                           :aggregate "mean"}}}
-           {:mark     {:type "errorbar" :extent "ci"}
-            :encoding {:x {:field "date" :type "temporal" :timeUnit "week"}
-                       :y {:field "cals" :type "quantitative"}}}
-           ;; {:mark     "rule"
-           ;;  :encoding {:x {:field "date" :type "temporal" :timeUnit "year"}}}
-           {:mark     "rule"
-            :encoding {:y {:field     "cals"
-                           :type      "quantitative"
-                           :aggregate "mean"}}}]})
+   :layer [{:mark     {:type "boxplot" :extent "min-max"}
+            :encoding {:x {:field    "date"
+                           :type     "temporal"
+                           :scale    {:zero false}
+                           :timeUnit "yearmonth"
+                           :axis     {:labelExpr "[timeFormat(datum.value, '%b'), timeFormat(datum.value, '%m') == '01' ? timeFormat(datum.value, '%Y') : '']"}}
+                       :y {:field "cals"
+                           :type  "quantitative"}}}]})
 
 (def macro-line-plot
   {:data   {:values data}
