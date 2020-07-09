@@ -100,6 +100,10 @@
     (merge zero-fill-blank x)
     x))
 
+;; Tested with and without transducers
+;; "Elapsed time: 230696.127188 msecs" - transducers
+;; "Elapsed time: 230266.066506 msecs" - without transducers
+;; I guess the reduce, flatten, and transform are more significant than how much of the file is held in memory
 (defn parse-detailed-export [file]
   (let [split-lines (with-open [rdr (clojure.java.io/reader file)]
                       (into []
