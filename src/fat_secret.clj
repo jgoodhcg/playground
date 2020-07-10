@@ -197,6 +197,7 @@
 ;; "Elapsed time: 230266.066506 msecs" - original implementation     - 71c2a11172551eb4fdc787f10863ae2428e4deb1
 ;; "Elapsed time: 230696.127188 msecs" - throw some tranducing at it - 85d8175c8407cda089066b439014d01e3c2f50b6
 ;; "Elapsed time: 233625.543827 msecs" - move reduce to the end      - 44814f23fcb1b3fd707bb2b530c1cdc2f0e15e4e
+;; "Elapsed time: 255480.378156 msecs" - rearrange some stuff        - da0e92b44d858f92ad293c1554f8c728a64aa4c2
 (def data
   (time (->> files
              (into [] (comp (map load-lines)
