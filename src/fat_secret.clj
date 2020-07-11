@@ -200,6 +200,7 @@
 ;; "Elapsed time: 255480.378156 msecs" - rearrange some stuff        - da0e92b44d858f92ad293c1554f8c728a64aa4c2
 ;; "Elapsed time: 215348.098774 msecs"
 ;; "Elapsed time: 212417.819437 msecs"
+;; "Elapsed time: 214530.844913 msecs" - transform all at the end    - 43df53a3c56276864e9535d6d138d1881924e373
 (def data
   (time (->> files
              (into [] (map load-lines))
