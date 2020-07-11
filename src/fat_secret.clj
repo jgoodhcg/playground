@@ -198,11 +198,13 @@
 ;; "Elapsed time: 230696.127188 msecs" - throw some tranducing at it - 85d8175c8407cda089066b439014d01e3c2f50b6
 ;; "Elapsed time: 233625.543827 msecs" - move reduce to the end      - 44814f23fcb1b3fd707bb2b530c1cdc2f0e15e4e
 ;; "Elapsed time: 255480.378156 msecs" - rearrange some stuff        - da0e92b44d858f92ad293c1554f8c728a64aa4c2
+;; "Elapsed time: 215348.098774 msecs"
+;; "Elapsed time: 212417.819437 msecs"
 (def data
   (time (->> files
-             (into [] (comp (map load-lines)
-                            (map transform-lines)))
-             (flatten))))
+             (into [] (map load-lines))
+             (flatten)
+             (transform-lines))))
 
 (def calories-line-plot
   {:data  {:values data}
