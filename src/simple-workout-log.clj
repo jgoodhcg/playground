@@ -46,24 +46,32 @@
                         (merge {} maybe-workout-day {:ytd-reps ytd-reps
                                                      :date     (.toString date)}))))))
 
+(def today (-> (ld/now)
+               (ld/format
+                 (java.time.format.DateTimeFormatter/ofPattern "yyyy-MM-dd"))))
 
 (oz/start-server!)
 
 (def reps-plot
-  {:data  {:values data}
-   :width 1500
+  {:data      {:values data}
+   :width     1500
+   :transform [{:filter {:field "date"
+                         :range [{:year 2020 :month "june" :date 20}
+                                 {:year 2020 :month "july" :date 27}]}
+                }]
+
    :layer [{:mark     "line"
-            :encoding {:x {:field "date"
-                           :type  "temporal"
-                           :axis  {:format "%d %b"}}
-                       :y {:field "ytd-reps"
-                           :type  "quantitative"}}}]})
+            :encoding {:x     {:field "date"
+                               :type  "temporal"
+                               :axis  {:format "%d %b"}}
+                       :y     {:field "ytd-reps"
+                               :type  "quantitative"}
+                       :color {:value "blue"}}}]})
 
 (def viz
-[:div
- [:h1 "2020 summer 10k reps"]
- [:div
-  [:vega-lite reps-plot]]])
-
+  [:div
+   [:h1 "2020 summer 10k reps"]
+   [:div
+    [:vega-lite reps-plot]]])
 
 (oz/view! viz)
