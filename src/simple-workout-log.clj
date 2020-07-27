@@ -53,20 +53,16 @@
 (oz/start-server!)
 
 (def reps-plot
-  {:data      {:values data}
-   :width     1500
-   :transform [{:filter {:field "date"
-                         :range [{:year 2020 :month "june" :date 20}
-                                 {:year 2020 :month "july" :date 27}]}
-                }]
-
+  {:data  {:values data}
+   :width 1500
    :layer [{:mark     "line"
             :encoding {:x     {:field "date"
                                :type  "temporal"
                                :axis  {:format "%d %b"}}
                        :y     {:field "ytd-reps"
                                :type  "quantitative"}
-                       :color {:value "blue"}}}]})
+                       :color {:condition
+                               {:test }}}}]})
 
 (def viz
   [:div
