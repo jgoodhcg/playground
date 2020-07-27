@@ -32,6 +32,10 @@
                                   (ld/parse start-date))
                                 0))))
 
+(def today (-> (ld/now)
+               (ld/format
+                 (java.time.format.DateTimeFormatter/ofPattern "yyyy-MM-dd"))))
+
 (def data (->> days
                (range)
                (map #(ld/plus-days (ld/parse start-date) %))
@@ -44,11 +48,8 @@
                             maybe-workout-day (->> pre-data (some #(if (= (.toString date) (:date %))
                                                                      % nil)))]
                         (merge {} maybe-workout-day {:ytd-reps ytd-reps
-                                                     :date     (.toString date)}))))))
-
-(def today (-> (ld/now)
-               (ld/format
-                 (java.time.format.DateTimeFormatter/ofPattern "yyyy-MM-dd"))))
+                                                     :date     (.toString date)
+                                                     :future   (ld/is-after date (ld/parse today))}))))))
 
 (oz/start-server!)
 
@@ -56,13 +57,13 @@
   {:data  {:values data}
    :width 1500
    :layer [{:mark     "line"
-            :encoding {:x     {:field "date"
-                               :type  "temporal"
-                               :axis  {:format "%d %b"}}
-                       :y     {:field "ytd-reps"
-                               :type  "quantitative"}
-                       :color {:condition
-                               {:test }}}}]})
+            :encoding {:x          {:field "date"
+                                    :type  "temporal"
+                                    :axis  {:format "%d %b"}}
+                       :y          {:field "ytd-reps"
+                                    :type  "quantitative"}
+                       :strokeDash {:field "future"
+                                    :type  "nominal"}}}]})
 
 (def viz
   [:div
