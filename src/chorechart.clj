@@ -1,6 +1,6 @@
 (ns chorechart
   (:require
-   [secrets :as secrets]
+   [secrets :refer [airtable-chores-api-key]]
    [oz.core :as oz]
    [clojure.data.json :as json]
    [clj-time.core :as time]
@@ -51,7 +51,7 @@
               (json/read-str :key-fn keyword))
           (concat chores (->> response :records)))))))
 
-(def chores-raw (get-chores! "app0ASuEp9abRqV2v" secrets/airtable-chores-api-key))
+(def chores-raw (get-chores! "app0ASuEp9abRqV2v" airtable-chores-api-key))
 
 (def chores-by-day-data
   (->> chores-raw
@@ -90,6 +90,7 @@
                                  :date   (:Date fields)
                                  :chore  (:Chore fields)
                                  :person (:Person fields)}))
+       (remove #(nil? (:date %)))
        (group-by (fn [item]
                    (-> item (:date)
                        (clojure.string/split #"-")
@@ -151,3 +152,22 @@
                         :mark     "line"})
 
 (oz/view! chores-cumulative)
+
+(def diverging-stacked-bar
+  {:data      {:values chores-by-month-data}
+   :transform [{:calculate "datum.person == 'Justin' ? -datum.count : datum.count"
+                :as        "signed_count"}]
+   :mark      "bar"
+   :encoding  {:y     {:field "date"
+                       :type  "nominal"
+                       :scort "descending"}
+               :x     {:field "signed_count"
+                       :title "chores"
+                       :axis  {:format "s"}}
+               :color {:field  "person"
+                       :scale  {:range ["#675193" "#ca8861"]}
+                       :legend {:orient "top" :title nil}}}
+   :config    {:view {:stroke nil}
+               :axis {:grid false}}})
+
+(oz/view! diverging-stacked-bar)
