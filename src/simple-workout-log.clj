@@ -36,7 +36,6 @@
                (ld/format
                  (java.time.format.DateTimeFormatter/ofPattern "yyyy-MM-dd"))))
 
-
 (def days-so-far (.between java.time.temporal.ChronoUnit/DAYS (ld/parse start-date)
                            (ld/parse today)))
 
