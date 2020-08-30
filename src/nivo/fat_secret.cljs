@@ -7,11 +7,7 @@
 
 (defn ^:dev/after-load start
   []
-  (rd/render [view] (.getElementById js/document "app"))
-  ;; (r/render-component
-  ;;   [view]
-  ;;   (.getElementById js/document "app"))
-  )
+  (rd/render [view] (.getElementById js/document "app"))  )
 
 (defn ^:export main
   []
