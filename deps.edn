@@ -13,5 +13,8 @@
          redux                 {:mvn/version "0.1.4"}
          semantic-csv          {:mvn/version "0.2.1-alpha1"}
          philoskim/debux       {:mvn/version "0.7.3"}
-         funcool/cuerdas       {:mvn/version "2020.03.26-3"}}
+         funcool/cuerdas       {:mvn/version "2020.03.26-3"}
+         thheller/shadow-cljs  {:mvn/version "2.11.1"}
+         reagent               {:mvn/version "1.0.0-alpha2"}
+         binaryage/devtools    {:mvn/version "1.0.2"}}
  :paths ["src" "resources"]}

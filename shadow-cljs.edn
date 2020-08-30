@@ -1,0 +1,12 @@
+{:deps true
+
+ :nrepl {:port 3333}
+
+ :builds
+ {:nivo-fat-secret
+  {:target     :browser
+   :output-dir "public/assets/nivo-fat-secret/js"
+   :asset-path "/assets/nivo-fat-secret/js"
+   :modules    {:main {:entries [nivo.fat-secret]}}
+   :devtools   {:http-root "public/assets/nivo-fat-secret"
+                :http-port 3000}}}}

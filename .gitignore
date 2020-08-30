@@ -6,3 +6,9 @@
 src/secrets.clj
 
 resources/ideas-Grid view.csv
+
+.shadow-cljs/
+
+node_modules/
+
+public/assets/nivo-fat-secret/js/
