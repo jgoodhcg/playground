@@ -4,7 +4,7 @@
             [oz.core :as oz]
             [cljc.java-time.local-date :as ld]))
 
-(def file "/home/justin/Nextcloud/projects/quantification-data/raw-data/simple-workout-log/2020-07-27-strength.csv")
+(def file "/home/justin/Nextcloud/projects/quantification-data/raw-data/simple-workout-log/2020-09-07-strength.csv")
 
 (def formatter (java.time.format.DateTimeFormatter/ofPattern "M/d/yy"))
 

@@ -1,0 +1,372 @@
+shadow-cljs - config: /home/justin/projects/playground/shadow-cljs.edn
+shadow-cljs - socket connect failed, server process dead?
+shadow-cljs - starting via "clojure"
+=============================================================================
+WARNING: The configured :dependencies in shadow-cljs.edn were ignored!
+         When using :deps they must be configured in deps.edn
+==============================================================================
+Downloading: tick/tick/0.4.27-alpha/tick-0.4.27-alpha.pom from clojars
+Downloading: time-literals/time-literals/0.1.3/time-literals-0.1.3.pom from clojars
+Downloading: cljsjs/js-joda-locale-en-us/3.1.1-1/js-joda-locale-en-us-3.1.1-1.pom from clojars
+Downloading: cljsjs/js-joda-timezone/2.2.0-0/js-joda-timezone-2.2.0-0.pom from clojars
+Downloading: time-literals/time-literals/0.1.3/time-literals-0.1.3.jar from clojars
+Downloading: cljsjs/js-joda-timezone/2.2.0-0/js-joda-timezone-2.2.0-0.jar from clojars
+Downloading: tick/tick/0.4.27-alpha/tick-0.4.27-alpha.jar from clojars
+Downloading: cljsjs/js-joda-locale-en-us/3.1.1-1/js-joda-locale-en-us-3.1.1-1.jar from clojars
+NPM dependency "react" has installed version "^16.13.1"
+"16.13.0" was required by jar:file:/home/justin/.m2/repository/reagent/reagent/1.0.0-alpha2/reagent-1.0.0-alpha2.jar!/deps.cljs
+NPM dependency "react-dom" has installed version "^16.13.1"
+"16.13.0" was required by jar:file:/home/justin/.m2/repository/reagent/reagent/1.0.0-alpha2/reagent-1.0.0-alpha2.jar!/deps.cljs
+running: yarn add --exact @js-joda/timezone@2.2.0 @js-joda/locale_en-us@3.1.1
+yarn add v1.22.4
+[1/4] Resolving packages...
+[2/4] Fetching packages...
+[3/4] Linking dependencies...
+warning " > @nivo/line@0.62.0" has unmet peer dependency "prop-types@>= 15.5.10 < 16.0.0".
+warning "@nivo/line > @nivo/annotations@0.62.0" has unmet peer dependency "prop-types@>= 15.5.10 < 16.0.0".
+warning "@nivo/line > @nivo/axes@0.62.0" has unmet peer dependency "prop-types@>= 15.5.10 < 16.0.0".
+warning "@nivo/line > @nivo/colors@0.62.0" has unmet peer dependency "prop-types@>= 15.5.10 < 16.0.0".
+warning "@nivo/line > @nivo/core@0.62.0" has unmet peer dependency "prop-types@>= 15.5.10 < 16.0.0".
+warning "@nivo/line > @nivo/legends@0.62.0" has unmet peer dependency "prop-types@>= 15.5.10 < 16.0.0".
+warning "@nivo/line > @nivo/scales@0.62.0" has unmet peer dependency "prop-types@>= 15.5.10 < 16.0.0".
+warning "@nivo/line > @nivo/tooltip@0.62.0" has unmet peer dependency "prop-types@>= 15.5.10 < 16.0.0".
+warning "@nivo/line > @nivo/voronoi@0.62.0" has unmet peer dependency "prop-types@>= 15.5.10 < 16.0.0".
+[4/4] Building fresh packages...
+success Saved lockfile.
+success Saved 2 new dependencies.
+info Direct dependencies
+├─ @js-joda/locale_en-us@3.1.1
+└─ @js-joda/timezone@2.2.0
+info All dependencies
+├─ @js-joda/locale_en-us@3.1.1
+└─ @js-joda/timezone@2.2.0
+Done in 3.42s.
+shadow-cljs - HTTP server available at http://localhost:3001
+shadow-cljs - server version: 2.11.1 running at http://localhost:9630
+shadow-cljs - nREPL server started on port 3333
+;; Connected to nREPL server - nrepl://localhost:3333
+;; CIDER 1.0.0snapshot, nREPL 0.8.2
+;; Clojure 1.10.1, Java 13.0.2
+;;     Docs: (doc function-name)
+;;           (find-doc part-of-name)
+;;   Source: (source function-name)
+;;  Javadoc: (javadoc java-object-or-class)
+;;     Exit: <C-c C-q>
+;;  Results: Stored in vars *1, *2, *3, an exception in *e;
+;;  Startup: /home/linuxbrew/.linuxbrew/bin/npx shadow-cljs -d nrepl:0.8.2 -d cider/piggieback:0.5.1 -d refactor-nrepl:2.5.0 -d cider/cider-nrepl:0.25.4 server
+;;
+;; ClojureScript REPL type: shadow
+;; ClojureScript REPL init form: (do (require '[shadow.cljs.devtools.api :as shadow]) (shadow/watch :memento-mori) (shadow/nrepl-select :memento-mori))
+;;
+[:memento-mori] Configuring build.
+[:memento-mori] Compiling ...
+[:memento-mori] Build completed. (180 files, 1 compiled, 1 warnings, 3.85s)
+To quit, type: :cljs/quit
+;; => [:selected :memento-mori]
+------ WARNING #1 - :undeclared-var --------------------------------------------
+ File: /home/justin/projects/playground/src/memento_mori/index.cljs:20:30
+--------------------------------------------------------------------------------
+  17 |         week-end        (-> birthday
+  18 |                             (ld/plus-weeks week-n)
+  19 |                             (ld/plus-days 6))
+  20 |         included-events (->> events
+------------------------------------^-------------------------------------------
+ Use of undeclared Var memento-mori.index/events
+--------------------------------------------------------------------------------
+  21 |                              (filter (partial filter-events
+  22 |                                               week-start
+  23 |                                               week-end)))]
+  24 | 
+--------------------------------------------------------------------------------
+[:memento-mori] Compiling ...
+[:memento-mori] Build completed. (180 files, 1 compiled, 0 warnings, 0.09s)
+[:memento-mori] Compiling ...
+[:memento-mori] Build completed. (180 files, 1 compiled, 0 warnings, 0.08s)
+[:memento-mori] Compiling ...
+[:memento-mori] Build completed. (209 files, 25 compiled, 0 warnings, 2.78s)
+shadow.user> 
+cljs.user> (ns memento-mori.index)
+;; => nil
+memento-mori.index> (tick.apha.api :as t)
+
+------ WARNING - :undeclared-var -----------------------------------------------
+ Resource: <eval>:1:2
+ Use of undeclared Var memento-mori.index/tick
+--------------------------------------------------------------------------------
+
+------ WARNING - :undeclared-var -----------------------------------------------
+ Resource: <eval>:1:20
+ Use of undeclared Var memento-mori.index/t
+--------------------------------------------------------------------------------
+
+;; => nil
+memento-mori.index> (require '[tick.alpha.api :as t])
+;; => nil
+memento-mori.index> (t/date "1991-09-16")
+;; => #time/date "1991-09-16"
+memento-mori.index> (t/date 1991 9 16)
+------ WARNING - :fn-arity -----------------------------------------------------
+ Resource: <eval>:1:1
+ Wrong number of args (3) passed to tick.alpha.api/date
+--------------------------------------------------------------------------------
+
+;; => nil
+memento-mori.index> (t/+ (t/date "1991-09-16") (t/days 7))
+;; => #object[Error Error: No protocol method ITimeLength.days defined for type number: 7]
+memento-mori.index> (ld/parse "1991-09-16")
+;; => #time/date "1991-09-16"
+memento-mori.index> (t/interval? {:tick/beginning (ld/parse "1991-09-16")
+                                  :tick/end (ld/parse "1991-09-18")})
+;; => true
+memento-mori.index> (require '[tick.interval :refer [overlaps?]])
+
+;; => nil
+memento-mori.index> (overlaps? {:tick/beginning (ld/parse "1991-09-16")
+                                  :tick/end (ld/parse "1991-09-18")}
+                               {:tick/beginning (ld/parse "1991-09-17")
+                                :tick/end (ld/parse "1991-09-17")})
+;; => false
+memento-mori.index> (overlaps? {:tick/beginning (ld/parse "1991-09-16")
+                                  :tick/end (ld/parse "1991-09-18")}
+                               {:tick/beginning (ld/parse "1991-09-17")
+                                :tick/end (ld/parse "1991-09-19")})
+;; => true
+memento-mori.index> (t/relation {:tick/beginning (ld/parse "1991-09-16")
+                                  :tick/end (ld/parse "1991-09-18")}
+                               {:tick/beginning (ld/parse "1991-09-17")
+                                :tick/end (ld/parse "1991-09-17")})
+;; => :contains
+memento-mori.index> (t/relation {:tick/beginning (ld/parse "1991-09-16")
+                                  :tick/end (ld/parse "1991-09-18")}
+                               {:tick/beginning (ld/parse "1991-09-14")
+                                :tick/end (ld/parse "1991-09-16")})
+;; => :met-by
+memento-mori.index> (t/relation {:tick/beginning (ld/parse "1991-09-16")
+                                  :tick/end (ld/parse "1991-09-18")}
+                               {:tick/beginning (ld/parse "1991-09-16")
+                                :tick/end (ld/parse "1991-09-17")})
+;; => :started-by
+memento-mori.index> (t/relation {:tick/beginning (ld/parse "1991-09-16")
+                                  :tick/end (ld/parse "1991-09-18")}
+                               {:tick/beginning (ld/parse "1991-09-16")
+                                :tick/end (ld/parse "1991-09-16")})
+;; => :started-by
+memento-mori.index> (some #{:precedes :preceded-by} (t/relation {:tick/beginning (ld/parse "1991-09-16")
+                                  :tick/end (ld/parse "1991-09-18")}
+                               {:tick/beginning (ld/parse "1991-09-16")
+                                :tick/end (ld/parse "1991-09-16")}))
+
+;; => #object[Error Error: :started-by is not ISeqable]
+memento-mori.index> (some #{:precedes :preceded-by} 
+                          [(t/relation {:tick/beginning (ld/parse "1991-09-16")
+                                  :tick/end (ld/parse "1991-09-18")}
+                               {:tick/beginning (ld/parse "1991-09-16")
+                                :tick/end (ld/parse "1991-09-16")})])
+
+;; => nil
+memento-mori.index> (some #{:precedes :preceded-by} 
+                          [(t/relation {:tick/beginning (ld/parse "1991-09-16")
+                                  :tick/end (ld/parse "1991-09-18")}
+                               {:tick/beginning (ld/parse "1991-09-14")
+                                :tick/end (ld/parse "1991-09-15")})])
+
+;; => :preceded-by
+memento-mori.index> (some? (some #{:precedes :preceded-by}
+                                 [(t/relation {:tick/beginning (ld/parse "1991-09-16")
+                                               :tick/end       (ld/parse "1991-09-18")}
+                                              {:tick/beginning (ld/parse "1991-09-14")
+                                               :tick/end       (ld/parse "1991-09-15")})]))
+
+;; => true[:memento-mori] Compiling ...
+[:memento-mori] Build completed. (209 files, 1 compiled, 3 warnings, 0.07s)
+
+------ WARNING #1 - :fn-arity --------------------------------------------------
+ File: /home/justin/projects/playground/src/memento_mori/index.cljs:17:12
+--------------------------------------------------------------------------------
+  14 |                :tick/end       week-end}
+  15 |         event {:tick/beginning date-start
+  16 |                :tick/end       (if-some [e date-end] e date-start)}]
+  17 |     (some? (some #{:precedes :preceded-by} event week))))
+------------------^-------------------------------------------------------------
+ Wrong number of args (3) passed to cljs.core/some
+--------------------------------------------------------------------------------
+  18 | 
+  19 | (defn create-week [year week-n]
+  20 |   (let [week-start      (-> birthday (ld/plus-weeks week-n))
+  21 |         week-end        (-> birthday
+--------------------------------------------------------------------------------
+
+------ WARNING #2 - :undeclared-var --------------------------------------------
+ File: /home/justin/projects/playground/src/memento_mori/index.cljs:25:47
+--------------------------------------------------------------------------------
+  22 |                             (ld/plus-weeks week-n)
+  23 |                             (ld/plus-days 6))
+  24 |         included-events (->> events
+  25 |                              (filter (partial filter-events
+-----------------------------------------------------^--------------------------
+ Use of undeclared Var memento-mori.index/filter-events
+--------------------------------------------------------------------------------
+  26 |                                               week-start
+  27 |                                               week-end)))]
+  28 | 
+  29 |     (map-of week-start week-end included-events)))
+--------------------------------------------------------------------------------
+
+------ WARNING #3 - :undeclared-var --------------------------------------------
+ File: /home/justin/projects/playground/src/memento_mori/index.cljs:24:30
+--------------------------------------------------------------------------------
+  21 |         week-end        (-> birthday
+  22 |                             (ld/plus-weeks week-n)
+  23 |                             (ld/plus-days 6))
+  24 |         included-events (->> events
+------------------------------------^-------------------------------------------
+ Use of undeclared Var memento-mori.index/events
+--------------------------------------------------------------------------------
+  25 |                              (filter (partial filter-events
+  26 |                                               week-start
+  27 |                                               week-end)))]
+  28 | 
+--------------------------------------------------------------------------------
+[:memento-mori] Compiling ...
+[:memento-mori] Build completed. (209 files, 1 compiled, 2 warnings, 0.07s)
+
+------ WARNING #1 - :fn-arity --------------------------------------------------
+ File: /home/justin/projects/playground/src/memento_mori/index.cljs:17:12
+--------------------------------------------------------------------------------
+  14 |                :tick/end       week-end}
+  15 |         event {:tick/beginning date-start
+  16 |                :tick/end       (if-some [e date-end] e date-start)}]
+  17 |     (some? (some #{:precedes :preceded-by} event week))))
+------------------^-------------------------------------------------------------
+ Wrong number of args (3) passed to cljs.core/some
+--------------------------------------------------------------------------------
+  18 | 
+  19 | (defn create-week [year week-n]
+  20 |   (let [week-start      (-> birthday (ld/plus-weeks week-n))
+  21 |         week-end        (-> birthday
+--------------------------------------------------------------------------------
+
+------ WARNING #2 - :undeclared-var --------------------------------------------
+ File: /home/justin/projects/playground/src/memento_mori/index.cljs:24:30
+--------------------------------------------------------------------------------
+  21 |         week-end        (-> birthday
+  22 |                             (ld/plus-weeks week-n)
+  23 |                             (ld/plus-days 6))
+  24 |         included-events (->> events
+------------------------------------^-------------------------------------------
+ Use of undeclared Var memento-mori.index/events
+--------------------------------------------------------------------------------
+  25 |                              (filter (partial event-overlap?
+  26 |                                               week-start
+  27 |                                               week-end)))]
+  28 | 
+--------------------------------------------------------------------------------
+[:memento-mori] Compiling ...
+[:memento-mori] Build completed. (209 files, 1 compiled, 1 warnings, 0.11s)
+
+------ WARNING #1 - :fn-arity --------------------------------------------------
+ File: /home/justin/projects/playground/src/memento_mori/index.cljs:25:12
+--------------------------------------------------------------------------------
+  22 |                :tick/end       week-end}
+  23 |         event {:tick/beginning date-start
+  24 |                :tick/end       (if-some [e date-end] e date-start)}]
+  25 |     (some? (some #{:precedes :preceded-by} event week))))
+------------------^-------------------------------------------------------------
+ Wrong number of args (3) passed to cljs.core/some
+--------------------------------------------------------------------------------
+  26 | 
+  27 | (defn create-week [year week-n]
+  28 |   (let [week-start      (-> birthday (ld/plus-weeks week-n))
+  29 |         week-end        (-> birthday
+--------------------------------------------------------------------------------
+[:memento-mori] Compiling ...
+[:memento-mori] Build completed. (209 files, 1 compiled, 1 warnings, 0.11s)
+
+------ WARNING #1 - :fn-arity --------------------------------------------------
+ File: /home/justin/projects/playground/src/memento_mori/index.cljs:25:45
+--------------------------------------------------------------------------------
+  22 |                :tick/end       week-end}
+  23 |         event {:tick/beginning date-start
+  24 |                :tick/end       (if-some [e date-end] e date-start)}]
+  25 |     (some? (some #{:precedes :preceded-by} [(t/relation) event week]))))
+---------------------------------------------------^----------------------------
+ Wrong number of args (0) passed to tick.alpha.api/relation
+--------------------------------------------------------------------------------
+  26 | 
+  27 | (defn create-week [year week-n]
+  28 |   (let [week-start      (-> birthday (ld/plus-weeks week-n))
+  29 |         week-end        (-> birthday
+--------------------------------------------------------------------------------
+[:memento-mori] Compiling ...
+[:memento-mori] Build completed. (209 files, 1 compiled, 0 warnings, 0.12s)
+The result object failed to print. It is available via *1 if you want to interact with it.
+The exception was: 
+#error {:message "The limit of 1048576 bytes was reached while printing.", :data {:tag :shadow.remote.runtime.writer/limit-reached, :limit 1048576}}
+
+memento-mori.index> (->> years
+     range
+     (map create-year))
+The result object failed to print. It is available via *1 if you want to interact with it.
+The exception was:
+#error {:message "The limit of 1048576 bytes was reached while printing.", :data {:tag :shadow.remote.runtime.writer/limit-reached, :limit 1048576}}
+;; => :shadow.cljs/print-error!
+memento-mori.index> (def years 90)
+(def weeks-per-year 52)
+(def birthday (ld/parse "1991-09-16"))
+
+(def events [{:date-start (ld/of 1991 9 30)
+              :name       "event 1"
+              :color      "#ff00ff"}
+             {:date-start (ld/of 1991 10 31)
+              :date-end   (ld/of 1991 10 23)
+              :name       "event 2"
+              :color      "#fff000"}])
+
+(defn event-overlap? [week-start week-end {:keys [date-start date-end]}]
+  (let [week  {:tick/beginning week-start
+               :tick/end       week-end}
+        event {:tick/beginning date-start
+               :tick/end       (if-some [e date-end] e date-start)}]
+    (some? (some #{:precedes :preceded-by} [(t/relation event week)]))))
+
+(defn create-week [year week-n]
+  (let [week-start      (-> birthday (ld/plus-weeks week-n))
+        week-end        (-> birthday
+                            (ld/plus-weeks week-n)
+                            (ld/plus-days 6))
+        included-events (->> events
+                             (filter (partial event-overlap?
+                                              week-start
+                                              week-end)))]
+
+    (map-of week-start week-end included-events)))
+
+(defn create-year [year-n]
+  (let [year  (-> birthday (ld/get-year) (+ year-n))
+        weeks (->> weeks-per-year
+                   range
+                   (map (partial create-week year)))]
+
+    (map-of year weeks)))
+
+
+;; => #'memento-mori.index/years;; => #'memento-mori.index/weeks-per-year;; => #'memento-mori.index/birthday;; => #'memento-mori.index/events;; => #'memento-mori.index/event-overlap?;; => #'memento-mori.index/create-week;; => #'memento-mori.index/create-year
+memento-mori.index> (require '[com.rpl.specter :as sp])
+
+;; => nil
+memento-mori.index> (sp/select [:years sp/ALL :weeks sp/ALL :included-events sp/ALL]
+                               (->> years
+     range
+     (map create-year)))
+
+;; => []
+memento-mori.index> 
+ (sp/select [:years sp/ALL :weeks sp/ALL :included-events sp/ALL]
+{:years
+(->> years
+range
+(map create-year))})
+
+;; output cleared
+
+memento-mori.index> 

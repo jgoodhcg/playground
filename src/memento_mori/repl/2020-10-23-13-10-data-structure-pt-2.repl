@@ -1,0 +1,143 @@
+shadow-cljs - config: /home/justin/projects/playground/shadow-cljs.edn
+shadow-cljs - socket connect failed, server process dead?
+shadow-cljs - starting via "clojure"
+=============================================================================
+WARNING: The configured :dependencies in shadow-cljs.edn were ignored!
+         When using :deps they must be configured in deps.edn
+==============================================================================
+Downloading: metosin/potpuri/0.5.2/potpuri-0.5.2.pom from clojars
+Downloading: metosin/potpuri/0.5.2/potpuri-0.5.2.jar from clojars
+NPM dependency "react" has installed version "^16.13.1"
+"16.13.0" was required by jar:file:/home/justin/.m2/repository/reagent/reagent/1.0.0-alpha2/reagent-1.0.0-alpha2.jar!/deps.cljs
+NPM dependency "react-dom" has installed version "^16.13.1"
+"16.13.0" was required by jar:file:/home/justin/.m2/repository/reagent/reagent/1.0.0-alpha2/reagent-1.0.0-alpha2.jar!/deps.cljs
+shadow-cljs - HTTP server available at http://localhost:3001
+shadow-cljs - server version: 2.11.1 running at http://localhost:9630
+shadow-cljs - nREPL server started on port 3333
+;; Connected to nREPL server - nrepl://localhost:3333
+;; CIDER 1.0.0snapshot, nREPL 0.8.2
+;; Clojure 1.10.1, Java 13.0.2
+;;     Docs: (doc function-name)
+;;           (find-doc part-of-name)
+;;   Source: (source function-name)
+;;  Javadoc: (javadoc java-object-or-class)
+;;     Exit: <C-c C-q>
+;;  Results: Stored in vars *1, *2, *3, an exception in *e;
+;;  Startup: /home/linuxbrew/.linuxbrew/bin/npx shadow-cljs -d nrepl:0.8.2 -d cider/piggieback:0.5.1 -d refactor-nrepl:2.5.0 -d cider/cider-nrepl:0.25.4 server
+;;
+;; ClojureScript REPL type: shadow
+;; ClojureScript REPL init form: (do (require '[shadow.cljs.devtools.api :as shadow]) (shadow/watch :memento-mori) (shadow/nrepl-select :memento-mori))
+;;
+[:memento-mori] Configuring build.
+[:memento-mori] Compiling ...
+[:memento-mori] Build completed. (179 files, 0 compiled, 0 warnings, 3.81s)
+To quit, type: :cljs/quit
+;; => [:selected :memento-mori][:memento-mori] Compiling ...
+[:memento-mori] Build completed. (180 files, 2 compiled, 0 warnings, 0.32s)
+No available JS runtime.
+See https://shadow-cljs.github.io/docs/UsersGuide.html#repl-troubleshootingshadow.user> 
+cljs.user> (def years 90)
+(def weeks-per-year 52)
+(def birthday (ld/parse "1991-09-16"))
+
+
+No available JS runtime.
+See https://shadow-cljs.github.io/docs/UsersGuide.html#repl-troubleshooting;; => nilNo available JS runtime.
+See https://shadow-cljs.github.io/docs/UsersGuide.html#repl-troubleshooting;; => nilNo available JS runtime.
+See https://shadow-cljs.github.io/docs/UsersGuide.html#repl-troubleshooting;; => nil
+cljs.user> (ns memento-mori.index)
+No available JS runtime.
+See https://shadow-cljs.github.io/docs/UsersGuide.html#repl-troubleshooting;; => nil[:memento-mori] Compiling ...
+[:memento-mori] Build completed. (180 files, 1 compiled, 0 warnings, 0.11s)
+
+cljs.user> 
+ (ns memento-mori.index)
+;; => nil
+memento-mori.index> (def years 90)
+(def weeks-per-year 52)
+(def birthday (ld/parse "1991-09-16"))
+
+
+;; => #'memento-mori.index/years;; => #'memento-mori.index/weeks-per-year;; => #'memento-mori.index/birthday
+memento-mori.index> (->> years
+      range
+      (map (fn [year-n]
+            {:year (-> birthday (ld/get-year) (+ year-n))
+             :weeks (->> weeks-per-year
+                         range
+                         (map (fn [week-n]
+                                (let [week-start (-> birthday (ld/plus-weeks week-n))
+                                      week-end   (-> birthday
+                                                     (ld/plus-weeks week-n)
+                                                     (ld/plus-days 6))]
+                                  (map-of week-start week-end)))))})))
+;; output cleared
+
+memento-mori.index> (def events [{:date-start (ld/of 1991 9 30)
+                                  :name "event 1"
+                                  :color "#ff00ff"}
+                                 {:date-start (ld/of 1991 10 31)
+                                  :date-end (ld/of 1991 10 23)
+                                  :name "event 2"
+                                  :color "#fff000"}])
+
+;; => #'memento-mori.index/events
+memento-mori.index> (->> years
+      range
+      (map (fn [year-n]
+             (let [year (-> birthday (ld/get-year) (+ year-n))
+                   weeks (->> weeks-per-year
+                         range
+                         (map (fn [week-n]
+                                (let [week-start (-> birthday (ld/plus-weeks week-n))
+                                      week-end   (-> birthday
+                                                     (ld/plus-weeks week-n)
+                                                     (ld/plus-days 6))]
+                                  (map-of week-start week-end)))))])
+            (map-of year weeks))))
+------ WARNING - :undeclared-var -----------------------------------------------
+ Resource: <eval>:13:21
+ Use of undeclared Var memento-mori.index/year
+--------------------------------------------------------------------------------
+
+------ WARNING - :undeclared-var -----------------------------------------------
+ Resource: <eval>:13:26
+ Use of undeclared Var memento-mori.index/weeks
+--------------------------------------------------------------------------------
+
+;; => nil
+memento-mori.index> (->> years
+      range
+      (map (fn [year-n]
+             (let [year  (-> birthday (ld/get-year) (+ year-n))
+                   weeks (->> weeks-per-year
+                              range
+                              (map (fn [week-n]
+                                     (let [week-start (-> birthday (ld/plus-weeks week-n))
+                                           week-end   (-> birthday
+                                                          (ld/plus-weeks week-n)
+                                                          (ld/plus-days 6))]
+                                       (map-of week-start week-end)))))]
+               (map-of year weeks)))))
+;; output cleared
+[:memento-mori] Compiling ...
+[:memento-mori] Build completed. (180 files, 1 compiled, 1 warnings, 0.13s)
+
+------ WARNING #1 - :undeclared-var --------------------------------------------
+ File: /home/justin/projects/playground/src/memento_mori/index.cljs:20:30
+--------------------------------------------------------------------------------
+  17 |         week-end        (-> birthday
+  18 |                             (ld/plus-weeks week-n)
+  19 |                             (ld/plus-days 6))
+  20 |         included-events (->> events
+------------------------------------^-------------------------------------------
+ Use of undeclared Var memento-mori.index/events
+--------------------------------------------------------------------------------
+  21 |                              (filter (partial filter-events
+  22 |                                               week-start
+  23 |                                               week-end)))]
+  24 | 
+--------------------------------------------------------------------------------
+
+memento-mori.index> 
+
