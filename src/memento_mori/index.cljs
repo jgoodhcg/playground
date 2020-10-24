@@ -6,20 +6,73 @@
             [cljc.java-time.local-date :as ld]
             [com.rpl.specter :as sp]))
 
+(def grey-50 "#fafafa")
+(def grey-100 "#f5f5f5")
+(def grey-300 "#e0e0e0")
+(def grey-400 "#bdbdbd")
+(def grey-500 "#9e9e9e")
+(def grey-900 "#212121")
+
+(def brown-300 "#a1887f")
+(def blue-200 "#90caf9")
+(def light-green-400 "#9ccc65")
+(def red-400 "#ef5350")
+(def red-600 "#e53935")
+(def red-800 "#c62828")
+(def indigo-200 "#9fa8da")
+(def indigo-300 "#7986cb")
+(def indigo-500 "#3f51b5")
+(def deep-purple-100 "#d1c4e9")
+(def deep-purple-300 "#9575cd")
+(def deep-purple-500 "#673ab7")
+(def deep-purple-700 "#512da8")
+(def deep-purple-800 "#4527a0")
+
 (def years 90)
 (def weeks-per-year 52)
 (def birthday (ld/parse "1991-09-16"))
-(def events [{:tick/beginning (ld/of 1991 9 30)
-              :name           "event 1"
-              :color          "#ff00ff"}
-             {:tick/beginning (ld/of 1991 10 31)
-              :tick/end       (ld/of 1991 10 23)
-              :name           "event 2"
-              :color          "#fff000"}
-             {:tick/beginning (ld/of 2020 1 1)
-              :tick/end       (ld/of 2020 12 31)
-              :name           "event 2"
-              :color          "#fff000"}])
+(def events [
+             {:name           "elementary and middle school"
+              ;; :color          indigo-200
+              :color          indigo-200
+              :tick/beginning (ld/of 1996 9 5)
+              :tick/end       (ld/of 2006 6 6)}
+             {:name           "high school"
+              ;; :color          brown-300
+              :color          indigo-300
+              :tick/beginning (ld/of 2006 9 5)
+              :tick/end       (ld/of 2010 6 6)}
+             {:name           "college"
+              ;; :color          blue-200
+              :color          indigo-500
+              :tick/beginning (ld/of 2010 9 5)
+              :tick/end       (ld/of 2015 8 6)}
+             {:name           "Wyoming IT intern"
+              ;; :color          light-green-400
+              :color          deep-purple-300
+              :tick/beginning (ld/of 2015 5 19)
+              :tick/end       (ld/of 2015 11 13)}
+             {:name           "One stop web developer"
+              ;; :color          grey-900
+              :color          deep-purple-500
+              :tick/beginning (ld/of 2016 2 18)
+              :tick/end       (ld/of 2017 5 11)}
+             {:name           "Tek Systems (GFS) software developer "
+              ;; :color          red-600
+              :color          deep-purple-700
+              :tick/beginning (ld/of 2017 5 11)
+              :tick/end       (ld/of 2018 5 14)}
+             {:name           "GFS full stack developer"
+              ;; :color          red-800
+              :color          deep-purple-800
+              :tick/beginning (ld/of 2018 5 14)
+              :tick/end       (ld/of 2020 10 23)}
+             {:name           "Archemedx senior backend developer"
+              ;; :color          red-800
+              :color          deep-purple-100
+              :tick/beginning (ld/of 2020 11 9) ;; why does it only show one square between 2020-10-23 instead of two?
+              :tick/end       (ld/of 2022 12 31)}
+             ])
 
 (defn event-overlap? [week-start week-end event]
   (let [week            {:tick/beginning week-start
