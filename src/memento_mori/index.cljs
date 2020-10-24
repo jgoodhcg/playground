@@ -6,15 +6,18 @@
             [cljc.java-time.local-date :as ld]
             [com.rpl.specter :as sp]))
 
-(def years 1)
+(def years 90)
 (def weeks-per-year 52)
 (def birthday (ld/parse "1991-09-16"))
-
 (def events [{:tick/beginning (ld/of 1991 9 30)
               :name           "event 1"
               :color          "#ff00ff"}
              {:tick/beginning (ld/of 1991 10 31)
               :tick/end       (ld/of 1991 10 23)
+              :name           "event 2"
+              :color          "#fff000"}
+             {:tick/beginning (ld/of 2020 1 1)
+              :tick/end       (ld/of 2020 12 31)
               :name           "event 2"
               :color          "#fff000"}])
 
@@ -46,12 +49,27 @@
 
     (map-of year weeks)))
 
-(->> years
-     range
-     (map create-year))
+(def data {:years (->> years
+                       range
+                       (map create-year))})
 
 (defn view []
-  [:div [:h1 "It works!"]])
+  [:div {:style {:display        "flex"
+                 :flex-direction "column"}}
+   (->> data
+        :years
+        (map (fn [year-data]
+               [:div {:style {:display        "flex"
+                              :flex-direction "row"}}
+                (->> year-data
+                     :weeks
+                     (map (fn [week-data]
+                            [:div {:style {:width            6
+                                           :height           6
+                                           :background-color (if (not-empty (:included-events week-data))
+                                                               (->> week-data :included-events last :color)
+                                                               "grey")
+                                           :margin           0.5}}])))])))])
 
 (defn ^:dev/after-load start
   []
