@@ -58,17 +58,26 @@
                  :flex-direction "column"}}
    (->> data
         :years
-        (map (fn [year-data]
+        (map (fn [{:keys [year weeks]}]
                [:div {:style {:display        "flex"
                               :flex-direction "row"}}
-                (->> year-data
-                     :weeks
-                     (map (fn [week-data]
+                (->> weeks
+                     (map (fn [{:keys [included-events week-end]}]
                             [:div {:style {:width            6
                                            :height           6
-                                           :background-color (if (not-empty (:included-events week-data))
-                                                               (->> week-data :included-events last :color)
-                                                               "grey")
+                                           :background-color (if (not-empty included-events)
+                                                               (->> included-events
+                                                                    (sort-by (fn [event]
+                                                                               (->>
+                                                                                 (if-some [d (:tick/end event)]
+                                                                                   d
+                                                                                   (:tick/beginning event))
+                                                                                 (ld/to-epoch-day))))
+                                                                    last
+                                                                    :color)
+                                                               (if (ld/is-after week-end (ld/now))
+                                                                 "blue"
+                                                                 "grey"))
                                            :margin           0.5}}])))])))])
 
 (defn ^:dev/after-load start
