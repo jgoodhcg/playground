@@ -53,32 +53,43 @@
                        range
                        (map create-year))})
 
+(defn determine-color [included-events week-end]
+  (if (not-empty included-events)
+    (->> included-events
+         (sort-by (fn [event]
+                    (->>
+                      (if-some [d (:tick/end event)]
+                        d
+                        (:tick/beginning event))
+                      (ld/to-epoch-day))))
+         last
+         :color)
+    (if (ld/is-after week-end (ld/now))
+      "blue"
+      "grey")))
+
+(defn render-weeks [weeks]
+  (->> weeks
+       (map (fn [{:keys [included-events week-end]}]
+              [:div {:style {:width            6
+                             :height           6
+                             :background-color (determine-color included-events week-end)
+                             :margin           0.5}}]))))
+
+(defn render-years [years]
+  (->> years
+       (map (fn [{:keys [year weeks]}]
+              [:div {:style {:display        "flex"
+                             :flex-direction "row"}}
+               (->> weeks
+                    (render-weeks))]))))
+
 (defn view []
   [:div {:style {:display        "flex"
                  :flex-direction "column"}}
    (->> data
         :years
-        (map (fn [{:keys [year weeks]}]
-               [:div {:style {:display        "flex"
-                              :flex-direction "row"}}
-                (->> weeks
-                     (map (fn [{:keys [included-events week-end]}]
-                            [:div {:style {:width            6
-                                           :height           6
-                                           :background-color (if (not-empty included-events)
-                                                               (->> included-events
-                                                                    (sort-by (fn [event]
-                                                                               (->>
-                                                                                 (if-some [d (:tick/end event)]
-                                                                                   d
-                                                                                   (:tick/beginning event))
-                                                                                 (ld/to-epoch-day))))
-                                                                    last
-                                                                    :color)
-                                                               (if (ld/is-after week-end (ld/now))
-                                                                 "blue"
-                                                                 "grey"))
-                                           :margin           0.5}}])))])))])
+        (render-years))])
 
 (defn ^:dev/after-load start
   []
