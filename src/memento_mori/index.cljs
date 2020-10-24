@@ -3,26 +3,27 @@
             [reagent.dom :as rd]
             [potpuri.core :refer [map-of]]
             [tick.alpha.api :as t]
-            [cljc.java-time.local-date :as ld]))
+            [cljc.java-time.local-date :as ld]
+            [com.rpl.specter :as sp]))
 
-(def years 90)
+(def years 1)
 (def weeks-per-year 52)
 (def birthday (ld/parse "1991-09-16"))
 
-(def events [{:date-start (ld/of 1991 9 30)
-              :name       "event 1"
-              :color      "#ff00ff"}
-             {:date-start (ld/of 1991 10 31)
-              :date-end   (ld/of 1991 10 23)
-              :name       "event 2"
-              :color      "#fff000"}])
+(def events [{:tick/beginning (ld/of 1991 9 30)
+              :name           "event 1"
+              :color          "#ff00ff"}
+             {:tick/beginning (ld/of 1991 10 31)
+              :tick/end       (ld/of 1991 10 23)
+              :name           "event 2"
+              :color          "#fff000"}])
 
-(defn event-overlap? [week-start week-end {:keys [date-start date-end]}]
-  (let [week  {:tick/beginning week-start
-               :tick/end       week-end}
-        event {:tick/beginning date-start
-               :tick/end       (if-some [e date-end] e date-start)}]
-    (some? (some #{:precedes :preceded-by} [(t/relation event week)]))))
+(defn event-overlap? [week-start week-end event]
+  (let [week            {:tick/beginning week-start
+                         :tick/end       week-end}
+        event-corrected {:tick/beginning (:tick/beginning event)
+                         :tick/end       (if-some [e (:tick/end event)] e (:tick/beginning event))}]
+    (not (some? (some #{:precedes :preceded-by} [(t/relation event-corrected week)])))))
 
 (defn create-week [year week-n]
   (let [week-start      (-> birthday (ld/plus-weeks week-n))
