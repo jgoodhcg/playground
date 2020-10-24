@@ -26,8 +26,9 @@
     (not (some? (some #{:precedes :preceded-by} [(t/relation event-corrected week)])))))
 
 (defn create-week [year week-n]
-  (let [week-start      (-> birthday (ld/plus-weeks week-n))
+  (let [week-start      (-> birthday (ld/with-year year) (ld/plus-weeks week-n))
         week-end        (-> birthday
+                            (ld/with-year year)
                             (ld/plus-weeks week-n)
                             (ld/plus-days 6))
         included-events (->> events
