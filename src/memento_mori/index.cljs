@@ -115,11 +115,14 @@
                         d
                         (:tick/beginning event))
                       (ld/to-epoch-day))))
+         ;; TODO prioritize events with just a beginning
          last
          :color)
     (if (ld/is-after week-end (ld/now))
-      "blue"
-      "grey")))
+      ;; future
+      grey-300
+      ;; past
+      grey-400)))
 
 (defn render-weeks [weeks]
   (->> weeks
