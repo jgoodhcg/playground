@@ -31,48 +31,50 @@
 (def years 90)
 (def weeks-per-year 52)
 (def birthday (ld/parse "1991-09-16"))
-(def events [
-             {:name           "elementary and middle school"
-              ;; :color          indigo-200
-              :color          indigo-200
-              :tick/beginning (ld/of 1996 9 5)
-              :tick/end       (ld/of 2006 6 6)}
-             {:name           "high school"
-              ;; :color          brown-300
-              :color          indigo-300
-              :tick/beginning (ld/of 2006 9 5)
-              :tick/end       (ld/of 2010 6 6)}
-             {:name           "college"
-              ;; :color          blue-200
-              :color          indigo-500
-              :tick/beginning (ld/of 2010 9 5)
-              :tick/end       (ld/of 2015 8 6)}
-             {:name           "Wyoming IT intern"
-              ;; :color          light-green-400
-              :color          deep-purple-300
-              :tick/beginning (ld/of 2015 5 19)
-              :tick/end       (ld/of 2015 11 13)}
-             {:name           "One stop web developer"
-              ;; :color          grey-900
-              :color          deep-purple-500
-              :tick/beginning (ld/of 2016 2 18)
-              :tick/end       (ld/of 2017 5 11)}
-             {:name           "Tek Systems (GFS) software developer "
-              ;; :color          red-600
-              :color          deep-purple-700
-              :tick/beginning (ld/of 2017 5 11)
-              :tick/end       (ld/of 2018 5 14)}
-             {:name           "GFS full stack developer"
-              ;; :color          red-800
-              :color          deep-purple-800
-              :tick/beginning (ld/of 2018 5 14)
-              :tick/end       (ld/of 2020 10 23)}
-             {:name           "Archemedx senior backend developer"
-              ;; :color          red-800
-              :color          deep-purple-100
-              :tick/beginning (ld/of 2020 11 9) ;; why does it only show one square between 2020-10-23 instead of two?
-              :tick/end       (ld/of 2022 12 31)}
-             ])
+(def events
+  (concat
+    (->> 10 range (map (fn [y]
+                         {:name           "elementary and middle school"
+                          :color          indigo-200
+                          :tick/beginning (ld/of (+ 1996 y) 9 5)
+                          :tick/end       (ld/of (+ 1997 y) 6 6)})))
+    (->> 4 range (map (fn [y]
+                        {:name           "high school"
+                         :color          indigo-300
+                         :tick/beginning (ld/of (+ 2006 y) 9 5)
+                         :tick/end       (ld/of (+ 2007 y) 6 6)})))
+    [
+     {:name           "college"
+      ;; :color          blue-200
+      :color          indigo-500
+      :tick/beginning (ld/of 2010 9 5)
+      :tick/end       (ld/of 2015 8 6)}
+     {:name           "Wyoming IT intern"
+      ;; :color          light-green-400
+      :color          deep-purple-300
+      :tick/beginning (ld/of 2015 5 19)
+      :tick/end       (ld/of 2015 11 13)}
+     {:name           "One stop web developer"
+      ;; :color          grey-900
+      :color          deep-purple-500
+      :tick/beginning (ld/of 2016 2 18)
+      :tick/end       (ld/of 2017 5 11)}
+     {:name           "Tek Systems (GFS) software developer "
+      ;; :color          red-600
+      :color          deep-purple-700
+      :tick/beginning (ld/of 2017 5 11)
+      :tick/end       (ld/of 2018 5 14)}
+     {:name           "GFS full stack developer"
+      ;; :color          red-800
+      :color          deep-purple-800
+      :tick/beginning (ld/of 2018 5 14)
+      :tick/end       (ld/of 2020 10 23)}
+     ;; {:name           "Archemedx senior backend developer"
+     ;;  ;; :color          red-800
+     ;;  :color          deep-purple-100
+     ;;  :tick/beginning (ld/of 2020 11 9) ;; why does it only show one square between 2020-10-23 instead of two? ;; That is because the squares are weeks based from my birthday, a monday.
+     ;;  :tick/end       (ld/of 2022 12 31)}
+     ]))
 
 (defn event-overlap? [week-start week-end event]
   (let [week            {:tick/beginning week-start
