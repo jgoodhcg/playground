@@ -109,4 +109,51 @@
 ;;    :badges ["SETUP" "PUT"],
 ;;    :cargo ["stereo" "gold fish" "slippers" "secret note"]}
 
-;; TODO continue from here https://juxt.pro/blog/crux-tutorial-datalog
+;; continued from here https://juxt.pro/blog/crux-tutorial-datalog
+
+(crux/q (crux/db node) `{:find  [element]
+                         :where [[element :type :element/metal]]})
+
+(crux/q (crux/db node) `{:find  [name]
+                         :where [[e :type :element/metal]
+                                 [e :common-name name]]})
+
+(crux/q (crux/db node) {:find  '[name]
+                        :where '[[e :type t]
+                                 [e :common-name name]]
+                        :args  [{'t :element/metal}]})
+
+;; why isn't this quoting the same?
+(crux/q (crux/db node) `{:find  [name]
+                         :where [[e :type t]
+                                 [e :common-name name]]
+                         :args  [{t :element/metal}]})
+
+(defn filter-type
+  [type]
+  (crux/q (crux/db node)
+          {:find  '[name]
+           :where '[[e :type t]
+                    [e :common-name name]]
+           :args  [{'t type}]}))
+
+(defn filter-appearance
+  [description]
+  (crux/q (crux/db node)
+          {:find  '[name IUPAC]
+           :where '[[e :common-name name]
+                    [e :IUPAC-name IUPAC]
+                    [e :appearance appearance]]
+           :args  [{'appearance description}]}))
+
+(filter-type :element/metal)
+;;=> #{["Gold"] ["Plutonium"]}
+
+(filter-appearance "white solid")
+;;=> #{["Borax" "Sodium tetraborate decahydrate"]}
+
+(crux/submit-tx
+  node [[:crux.tx/put (assoc manifest
+                             :badges ["SETUP" "PUT" "DATALOG-QUERIES"])]])
+
+;; TODO continue from here https://juxt.pro/blog/crux-tutorial-bitemp
