@@ -7,6 +7,8 @@
          datascript/datascript               {:mvn/version "1.0.3"}
          funcool/cuerdas                     {:mvn/version "2020.03.26-3"}
          juxt/crux-core                      {:mvn/version "20.12-1.13.0-beta"}
+         juxt/crux-rocksdb                   {:mvn/version "21.04-1.16.0-beta"}
+         juxt/crux-http-server               {:mvn/version "21.04-1.16.0-alpha"}
          kixi/stats                          {:mvn/version "0.5.2"}
          metasoarous/oz                      {:mvn/version "1.6.0-alpha7-SNAPSHOT"}
          metosin/potpuri                     {:mvn/version "0.5.2"}
