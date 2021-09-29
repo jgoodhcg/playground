@@ -8,3 +8,15 @@
             :where [?e :node/title ?n]])
      vec
      flatten)
+
+;; This was a query result in the form of:
+;; [ ["page-title" <id-of-block-ref>] ... ]
+(->> "/home/justin/Desktop/tmp-pages.edn"
+     slurp
+     read-string
+     (map first)
+     frequencies
+     (map identity)
+     (sort-by second)
+     (reverse)
+     (take 25))
