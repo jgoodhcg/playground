@@ -48,3 +48,27 @@
 (def minor-intervals [2 1 2 2 1 2 2])
 (!> [:piano (scale minor-intervals :c)])
 (!> [:piano (->> :c (scale minor-intervals) shuffle (take 5))])
+
+;; can I define a melody via position in a scale?
+(defn diatonic-melody
+  [positions s]
+  (->> positions (mapv #(get s (-> % (- 1))))))
+(!> [:piano (->> :c (scale major-intervals) (diatonic-melody [1 3 7]))])
+
+;; let's play around with chords
+(!> [:piano #{:a :b :c}])
+;; how about a major triad?
+(defn chord
+  [positions s]
+  (->> (diatonic-melody positions s) set))
+(def triad [1 3 5])
+(!> [:piano (->> :c (scale major-intervals) (chord triad))])
+
+;; circle of fifths
+(def major-circle-sharps [:c :g :d :a :e :b :f# :c# :g# :d# :a# :f])
+(defn I
+  [])
+(defn IV
+  [])
+(defn V
+  [])
