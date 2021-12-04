@@ -21,7 +21,7 @@
        (map str)
        frequencies))
 
-(def daylio-data
+(def daylio-data-a
   (->> "/home/justin/Nextcloud/projects/quantification-data/raw-data/daylio/daylio_export_2021_06_03.csv"
        (sc/slurp-csv)
        (filter #(or (s/includes? (:activities %) "")
@@ -34,7 +34,15 @@
        (map :﻿full_date)
        date-col->frequencies))
 
-(def airtable-data
+(def daylio-data-b
+  (->> "/home/justin/Nextcloud/projects/quantification-data/raw-data/daylio/daylio_export_2021_06_03.csv"
+       (sc/slurp-csv)
+       (filter #(or (s/includes? (:activities %) "")))
+       (remove #(or (s/includes? (:activities %) "")))
+       (map :﻿full_date)
+       date-col->frequencies))
+
+(def airtable-data-a
   (->> "/home/justin/Nextcloud/projects/quantification-data/raw-data/airtable/kpi/activity-log-2021-12-04.csv"
        (sc/slurp-csv)
        (filter #(and (some? (:day %)) (not= "#ERROR!" (:day %))))
@@ -45,13 +53,25 @@
        (map :day)
        date-col->frequencies))
 
-(def all-data (->> (concat daylio-data airtable-data)
-                   (map (fn [[k v]] {:date k :count v}))
-                   (sort-by :date)))
+(def airtable-data-b
+  (->> "/home/justin/Nextcloud/projects/quantification-data/raw-data/airtable/kpi/activity-log-2021-12-04.csv"
+       (sc/slurp-csv)
+       (filter #(and (some? (:day %)) (not= "#ERROR!" (:day %))))
+       (filter #(s/includes? (:activity %) ""))
+       (map :day)
+       date-col->frequencies))
+
+(def all-data (concat (->> (concat daylio-data-a airtable-data-a)
+                           (map (fn [[k v]] {:date k :count v :category "a"}))
+                           (sort-by :date))
+                      (->> (concat daylio-data-b airtable-data-b)
+                           (map (fn [[k v]] {:date k :count v :category "b"}))
+                           (sort-by :date))))
 
 (def occurrences-by-month {:data     {:values all-data}
-                           :encoding {:x {:field "date" :type "nominal"}
-                                      :y {:field "count" :type "quantitative"}}
+                           :encoding {:x     {:field "date" :type "nominal"}
+                                      :y     {:field "count" :type "quantitative"}
+                                      :color {:field "category"}}
                            :mark     "bar"})
 
 (oz/start-server!)
