@@ -11,7 +11,7 @@
          juxt/crux-rocksdb                   {:mvn/version "21.04-1.16.0-beta"}
          juxt/crux-http-server               {:mvn/version "21.04-1.16.0-alpha"}
          kixi/stats                          {:mvn/version "0.5.2"}
-         metasoarous/oz                      {:mvn/version "1.6.0-alpha7-SNAPSHOT"}
+         metasoarous/oz                      {:mvn/version "2.0.0-alpha1"}
          metosin/potpuri                     {:mvn/version "0.5.2"}
          metosin/spec-tools                  {:mvn/version "0.10.1"}
          net.cgrand/xforms                   {:mvn/version "0.19.2"}
