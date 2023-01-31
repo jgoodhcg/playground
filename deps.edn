@@ -23,7 +23,7 @@
         redux/redux                         {:mvn/version "0.1.4"}
         semantic-csv/semantic-csv           {:mvn/version "0.2.1-alpha1"}
         philoskim/debux                     {:mvn/version "0.7.3"}
-        tick/tick                           {:mvn/version "0.4.27-alpha"} ;; use this for time stuff though for real
+        tick/tick                           {:mvn/version "0.5.0"}
         thheller/shadow-cljs                {:mvn/version "2.11.1"}
 
         }
