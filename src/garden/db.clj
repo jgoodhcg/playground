@@ -48,9 +48,13 @@
   (ds/spec {:spec         user-ds
             :name         ::workouts
             :keys-default ds/opt}))
+
 (comment
   (xt/submit-tx node [[::xt/put me]])
 
-  (-> node (xt/db) (xt/q '{:find [(pull ?user [:user/name :garden/type :xt/id])]
+  (-> node (xt/db) (xt/q '{:find [(pull ?user [*])]
                            :where [[?user :garden/type :garden/user]]}))
+
+  (-> node (xt/db) (xt/entity-history #uuid "1e4a3cba-b5f2-4587-a200-638457f8dc21"
+                                      :desc {:with-docs? true}))
   )
