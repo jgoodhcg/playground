@@ -69,36 +69,36 @@
 
 {::clerk/visibility {:code :show :result :show}}
 (clerk/html
-(let [include-seasons true]
-  (html
-   [:div.grid.grid-cols-1.divide-y
-    [:div.grid.grid-cols-7.divide-x
-     (->> ["Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun"]
-          (map (fn [dow] [:div.w-full.h-8.p-2.bg-gray-100 dow])))]
-    (->> calendar
-         (map (fn [week]
-                [:div.grid.grid-cols-7.divide-x
-                 (->> week
-                      (map (fn [day]
-                             (let [d (t/day-of-month day)
-                                   is-first (= d 1)
-                                   is-today (t/= day (t/date))
-                                   this-season (season (-> day t/month t/int))]
-                               [(keyword (str "div.w-full.h-24"
-                                              (cond is-today ".bg-indigo-200"
-                                                    is-first ".bg-gray-100")))
-                                (when include-seasons
-                                  (cond
-                                    (= this-season :spring) [:div.w-full.h-1.bg-green-100]
-                                    (= this-season :summer) [:div.w-full.h-1.bg-lime-100]
-                                    (= this-season :fall)   [:div.w-full.h-1.bg-amber-100]
-                                    (= this-season :winter) [:div.w-full.h-1.bg-blue-100]))
-                                [:div.m-2
-                                 (t/format (t/formatter (str (when is-first "MMM ")
-                                                             "dd")) day)]])))
-                      fill-week
-                      )])))])))
+ (let [include-seasons true]
+   (html
+    [:div.grid.grid-cols-1.divide-y
+     [:div.grid.grid-cols-7.divide-x
+      (->> ["Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun"]
+           (map (fn [dow] [:div.w-full.h-8.p-2.bg-gray-100 dow])))]
+     (->> calendar
+          (map (fn [week]
+                 [:div.grid.grid-cols-7.divide-x
+                  (->> week
+                       (map (fn [day]
+                              (let [d (t/day-of-month day)
+                                    is-first (= d 1)
+                                    is-today (t/= day (t/date))
+                                    this-season (season (-> day t/month t/int))]
+                                [(keyword (str "div.w-full.h-24"
+                                               (cond is-today ".bg-indigo-200"
+                                                     is-first ".bg-gray-100")))
+                                 (when include-seasons
+                                   (cond
+                                     (= this-season :spring) [:div.w-full.h-1.bg-green-100]
+                                     (= this-season :summer) [:div.w-full.h-1.bg-lime-100]
+                                     (= this-season :fall)   [:div.w-full.h-1.bg-amber-100]
+                                     (= this-season :winter) [:div.w-full.h-1.bg-blue-100]))
+                                 [:div.m-2
+                                  (t/format (t/formatter (str (when is-first "MMM ")
+                                                              "dd")) day)]])))
+                       fill-week)])))])))
  
+
 
 
 
