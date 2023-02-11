@@ -18,3 +18,9 @@ public/assets/memento-mori/js/
 .clerk/
 
 resources/
+
+.calva/
+
+.clj-kondo/
+
+.lsp/

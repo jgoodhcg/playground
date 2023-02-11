@@ -2,12 +2,12 @@
   (:require [nextjournal.clerk :as clerk]
             [tick.core :as t]
             [tick.alpha.interval :as t.i]
-            ))
+            [hiccup.core :refer [html]])) 
 
 {::clerk/visibility {:code :hide :result :hide}}
 (comment
-  (clerk/serve! {:watch-paths ["src" "resources"] :browse? true})
-  (clerk/show! "src/garden/planting.clj")
+  (clerk/serve! {:watch-paths ["src" "resources"] :browse? true}) 
+  (clerk/show! "src/garden/planting.clj") 
 )
 {::clerk/visibility {:code :show :result :show}}
 
@@ -19,7 +19,11 @@
      (t/end intvl)
      (t/new-period 1 :days))))
 
-(clerk/html
- [:div.h-full.w-full.border-2.border-indigo-600
-  #_(for [day days-of-this-year]
-    [:div.h-4.w-2.bg-indigo-600 [:span "hello"]])])
+(def calendar
+  [:div.h-fit.w-100.flex.flex-row.flex-wrap
+   (doall
+    (->> days-of-this-year
+         (map (fn [day]
+                [:div.h-24.w-20.bg-indigo-600.text-white [:span (str day)]]))))])
+
+(clerk/html (html calendar))
