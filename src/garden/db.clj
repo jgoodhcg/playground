@@ -24,29 +24,31 @@
 (def me
   {:xt/id       #uuid "1e4a3cba-b5f2-4587-a200-638457f8dc21"
    :garden/type :garden/user
-   :user/name   "Justin"})
+   :user/name   "Justin"}) 
 
 (def user-ds
   {(ds/req :xt/id)       uuid?
-   (ds/req :garden/type) :garden/user
+   (ds/req :garden/type) keyword?
    :user/name            string?})
 
 (def user-spec
   (ds/spec {:spec         user-ds
-            :name         ::workouts
+            :name         ::user
             :keys-default ds/opt}))
+
+(s/valid? user-spec me) 
 
 (def seed-catalog-item-ds
   {(ds/req :xt/id)                                         uuid?
-   (ds/req :garden/type)                                   :keyword
+   (ds/req :garden/type)                                   keyword?
    :seed-catalog-item/name                                 string?
    :seed-catalog-item/indoor-start-last-frost-offset-early t/period?
    :seed-catalog-item/indoor-start-last-frost-offset-late  t/period?
    :seed-catalog-item/latin-name                           string?})
 
 (def seed-catalog-item-spec
-  (ds/spec {:spec         user-ds
-            :name         ::workouts
+  (ds/spec {:spec         seed-catalog-item-ds
+            :name         ::seed-catalog-item
             :keys-default ds/opt}))
 
 (comment
@@ -59,190 +61,208 @@
                                       :desc {:with-docs? true}))
   )
 
+;; - numbers are days to add to the frost date for season
+;; - negative numbers will result in a date _before_ the frost date
+;; - positive numbers will result in a date _after_ the frost date
+;; - compiled from spring and fall starting spreadsheets here:
+;; - https://www.ufseeds.com/crop-calculators.html
 (def planting-data
-  {:artichoke       {:spring {:start      56
+  {:artichoke       {:spring {:start      -56
                               :sow        0
                               :transplant 0}
                      :fall   {:start      nil
+                              :sow        nil
+                              :transplant nil}}
+   :beans           {:spring {:start      -56
                               :sow        0
-                              :transplant nil}}
-   :beans           {:spring {:start      nil
-                              :sow        0
-                              :transplant nil}
-                     :fall   {:start      nil
-                              :sow        nil
-                              :transplant nil}} 
-   :beets           {:spring {:start      nil
-                              :sow        nil
-                              :transplant nil}
-                     :fall   {:start      nil
-                              :sow        nil
-                              :transplant nil}} 
-   :broccoli        {:spring {:start      nil
-                              :sow        nil
-                              :transplant nil}
-                     :fall   {:start      nil
-                              :sow        nil
-                              :transplant nil}} 
-   :brussel-sprouts {:spring {:start      nil
-                              :sow        nil
                               :transplant nil}
                      :fall   {:start      nil
                               :sow        nil
                               :transplant nil}}
-   :cabbage         {:spring {:start      nil
-                              :sow        nil
-                              :transplant nil}
+   :beets           {:spring {:start      -56
+                              :sow        -14
+                              :transplant -14}
                      :fall   {:start      nil
-                              :sow        nil
+                              :sow        -70
                               :transplant nil}}
+   :broccoli        {:spring {:start      -56
+                              :sow        -14
+                              :transplant -14}
+                     :fall   {:start      -110
+                              :sow        nil
+                              :transplant -80}}
+   :brussel-sprouts {:spring {:start      -56
+                              :sow        -14
+                              :transplant -14}
+                     :fall   {:start      -150
+                              :sow        nil
+                              :transplant -120}}
+   :cabbage         {:spring {:start      -70
+                              :sow        -28
+                              :transplant -28}
+                     :fall   {:start      -118
+                              :sow        nil
+                              :transplant -90}}
    :carrots         {:spring {:start      nil
-                              :sow        nil
+                              :sow        -21
                               :transplant nil}
                      :fall   {:start      nil
-                              :sow        nil
+                              :sow        -96
                               :transplant nil}}
-   :cauliflower     {:spring {:start      nil
+   :cauliflower     {:spring {:start      -56
+                              :sow        -14
+                              :transplant -14}
+                     :fall   {:start      -110
                               :sow        nil
-                              :transplant nil}
+                              :transplant -80}}
+   :celery          {:spring {:start      -77
+                              :sow        7
+                              :transplant 7}
+                     :fall   {:start      -140
+                              :sow        nil
+                              :transplant -112}}
+   :chard           {:spring {:start      -56
+                              :sow        -14
+                              :transplant -14}
                      :fall   {:start      nil
-                              :sow        nil
+                              :sow        -65
                               :transplant nil}}
-   :celery          {:spring {:start      nil
+   :collards        {:spring {:start      -63
+                              :sow        -28
+                              :transplant -28}
+                     :fall   {:start      -117
                               :sow        nil
-                              :transplant nil}
-                     :fall   {:start      nil
-                              :sow        nil
-                              :transplant nil}}
-   :chard           {:spring {:start      nil
-                              :sow        nil
-                              :transplant nil}
-                     :fall   {:start      nil
-                              :sow        nil
-                              :transplant nil}}
-   :collards        {:spring {:start      nil
-                              :sow        nil
-                              :transplant nil}
-                     :fall   {:start      nil
-                              :sow        nil
-                              :transplant nil}}
+                              :transplant -87}}
    :corn            {:spring {:start      nil
-                              :sow        nil
+                              :sow        7
                               :transplant nil}
                      :fall   {:start      nil
                               :sow        nil
                               :transplant nil}}
    :cucumbers       {:spring {:start      nil
-                              :sow        nil
+                              :sow        0
                               :transplant nil}
                      :fall   {:start      nil
                               :sow        nil
                               :transplant nil}}
-   :eggplant        {:spring {:start      nil
-                              :sow        nil
-                              :transplant nil}
+   :eggplant        {:spring {:start      -42
+                              :sow        14
+                              :transplant 14}
                      :fall   {:start      nil
                               :sow        nil
                               :transplant nil}}
    :gourds          {:spring {:start      nil
-                              :sow        nil
+                              :sow        14
                               :transplant nil}
                      :fall   {:start      nil
                               :sow        nil
                               :transplant nil}}
-   :kale            {:spring {:start      nil
-                              :sow        nil
-                              :transplant nil}
+   :kale            {:spring {:start      -70
+                              :sow        -28
+                              :transplant -28}
                      :fall   {:start      nil
-                              :sow        nil
+                              :sow        -85
                               :transplant nil}}
-   :kohlrabi        {:spring {:start      nil
-                              :sow        nil
-                              :transplant nil}
+   :kohlrabi        {:spring {:start      -70
+                              :sow        -28
+                              :transplant -28}
                      :fall   {:start      nil
-                              :sow        nil
+                              :sow        -60
                               :transplant nil}}
-   :leek            {:spring {:start      nil
+   :leek            {:spring {:start      -84
+                              :sow        -14
+                              :transplant -14}
+                     :fall   {:start      -145
                               :sow        nil
-                              :transplant nil}
+                              :transplant -110}}
+   :lettuce         {:spring {:start      -82
+                              :sow        -28
+                              :transplant -28}
                      :fall   {:start      nil
-                              :sow        nil
-                              :transplant nil}}
-   :lettuce         {:spring {:start      nil
-                              :sow        nil
-                              :transplant nil}
-                     :fall   {:start      nil
-                              :sow        nil
+                              :sow        -70
                               :transplant nil}}
    :melons          {:spring {:start      nil
-                              :sow        nil
+                              :sow        14
                               :transplant nil}
                      :fall   {:start      nil
                               :sow        nil
                               :transplant nil}}
-   :okra            {:spring {:start      nil
-                              :sow        nil
-                              :transplant nil}
+   :okra            {:spring {:start      -42
+                              :sow        14
+                              :transplant 14}
                      :fall   {:start      nil
                               :sow        nil
                               :transplant nil}}
-   :onions          {:spring {:start      nil
-                              :sow        nil
-                              :transplant nil}
+   :onions          {:spring {:start      -98
+                              :sow        -28
+                              :transplant -28}
                      :fall   {:start      nil
-                              :sow        nil
+                              :sow        -80
                               :transplant nil}}
    :peas            {:spring {:start      nil
-                              :sow        nil
+                              :sow        -56
                               :transplant nil}
                      :fall   {:start      nil
-                              :sow        nil
+                              :sow        -103
                               :transplant nil}}
-   :peppers         {:spring {:start      nil
-                              :sow        nil
-                              :transplant nil}
+   :peppers         {:spring {:start      -56
+                              :sow        7
+                              :transplant 7}
                      :fall   {:start      nil
                               :sow        nil
                               :transplant nil}}
    :pumpkins        {:spring {:start      nil
-                              :sow        nil
+                              :sow        14
                               :transplant nil}
                      :fall   {:start      nil
                               :sow        nil
                               :transplant nil}}
    :radish          {:spring {:start      nil
-                              :sow        nil
+                              :sow        -35
                               :transplant nil}
+                     :fall   {:start      nil
+                              :sow        -40
+                              :transplant nil}}
+   :spinach         {:spring {:start      -77
+                              :sow        -42
+                              :transplant -42}
+                     :fall   {:start      nil
+                              :sow        -57
+                              :transplant nil}}
+   :squash          {:spring {:start      -14
+                              :sow        14
+                              :transplant 14}
                      :fall   {:start      nil
                               :sow        nil
                               :transplant nil}}
-   :spinach         {:spring {:start      nil
-                              :sow        nil
-                              :transplant nil}
-                     :fall   {:start      nil
-                              :sow        nil
-                              :transplant nil}}
-   :squash          {:spring {:start      nil
-                              :sow        nil
-                              :transplant nil}
-                     :fall   {:start      nil
-                              :sow        nil
-                              :transplant nil}}
-   :tomatoes        {:spring {:start      nil
-                              :sow        nil
-                              :transplant nil}
+   :tomatoes        {:spring {:start      -49
+                              :sow        7
+                              :transplant 7}
                      :fall   {:start      nil
                               :sow        nil
                               :transplant nil}}
    :turnips         {:spring {:start      nil
-                              :sow        nil
+                              :sow        -35
+                              :transplant nil}
+                     :fall   {:start      nil
+                              :sow        -60
+                              :transplant nil}}
+   :watermelons     {:spring {:start      -14
+                              :sow        14
                               :transplant nil}
                      :fall   {:start      nil
                               :sow        nil
                               :transplant nil}}
-   :watermelons     {:spring {:start      nil
+   :fennel          {:spring {:start      nil
                               :sow        nil
                               :transplant nil}
                      :fall   {:start      nil
+                              :sow        -107
+                              :transplant nil}}
+   :greens          {:spring {:start      nil
                               :sow        nil
-                              :transplant nil}}})
+                              :transplant nil}
+                     :fall   {:start      nil
+                              :sow        -68
+                              :transplant nil}}
+   })
