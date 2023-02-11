@@ -2,7 +2,9 @@
   (:require [nextjournal.clerk :as clerk]
             [tick.core :as t]
             [tick.alpha.interval :as t.i]
-            [hiccup.core :refer [html]])) 
+            [hiccup.core :refer [html]]
+            [garden.db :refer [planting-data]]
+            [potpuri.core :as pot])) 
 
 {::clerk/visibility {:code :hide :result :hide}}
 (comment
@@ -11,7 +13,7 @@
 )
 {::clerk/visibility {:code :show :result :show}}
 
-{::clerk/visibility {:code :fold :result :hide}}
+{::clerk/visibility {:code :hide :result :hide}}
 (def days-of-this-year
   (->> (let [intvl (t.i/bounds (t/year))]
          (t/range
@@ -50,7 +52,7 @@
   [vec]
   (let [num-to-add (- 7 (count vec))]
     (if (> num-to-add 0)
-      (concat (repeat num-to-add [:div.w-full.h-24.p-2.bg-gray-200]) vec)
+      (concat (repeat num-to-add [:div.w-full.h-48.p-2.bg-gray-200]) vec)
       vec))) 
 
 (defn season
@@ -67,7 +69,45 @@
       (fall month) :fall
       :else :invalid))) 
 
-{::clerk/visibility {:code :show :result :show}}
+(def plants (-> planting-data keys))
+
+(def icons {:sow "🌽" :start "🌱" :transplant "🌲"})
+
+(def colors {:sow "red" :start "orange" :transplant "purple"})
+
+(defn plantings-today [{:keys [day last-frost first-frost]}]
+  (->> plants
+       (map (fn [plant]
+              (let [info (get planting-data plant)
+
+                    {spring-start-offset      :start
+                     spring-sow-offset        :sow
+                     spring-transplant-offset :transplant}
+                    (:spring info)
+
+                    {fall-start-offset      :start
+                     fall-sow-offset        :sow
+                     fall-transplant-offset :transplant}
+                    (:fall info)
+
+                    spring-start      (-> last-frost (t/>> (t/new-period spring-start-offset :days)))
+                    spring-sow        (-> last-frost (t/>> (t/new-period spring-sow-offset :days)))
+                    spring-transplant (-> last-frost (t/>> (t/new-period spring-transplant-offset :days)))
+
+                    fall-start      (-> first-frost (t/>> (t/new-period fall-start-offset :days)))
+                    fall-sow        (-> first-frost (t/>> (t/new-period fall-sow-offset :days)))
+                    fall-transplant (-> first-frost (t/>> (t/new-period fall-transplant-offset :days)))
+                    
+                    start      (or (t/= spring-start day)
+                                   (t/= fall-start day))
+                    sow        (or (t/= spring-sow day)
+                                   (t/= fall-sow day))
+                    transplant (or (t/= spring-transplant day)
+                                   (t/= fall-transplant day))]
+
+                (pot/map-of start sow transplant))))))
+
+{::clerk/visibility {:code :fold :result :show}}
 (clerk/html
  (let [include-seasons true]
    (html
@@ -84,7 +124,7 @@
                                     is-first (= d 1)
                                     is-today (t/= day (t/date))
                                     this-season (season (-> day t/month t/int))]
-                                [(keyword (str "div.w-full.h-24"
+                                [(keyword (str "div.w-full.h-48"
                                                (cond is-today ".bg-indigo-200"
                                                      is-first ".bg-gray-100")))
                                  (when include-seasons
@@ -95,7 +135,8 @@
                                      (= this-season :winter) [:div.w-full.h-1.bg-blue-100]))
                                  [:div.m-2
                                   (t/format (t/formatter (str (when is-first "MMM ")
-                                                              "dd")) day)]])))
+                                                              "dd")) day)]
+                                 [:div "plants go here"]])))
                        fill-week)])))])))
  
 
