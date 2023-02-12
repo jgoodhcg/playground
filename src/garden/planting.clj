@@ -52,7 +52,7 @@
   [vec]
   (let [num-to-add (- 7 (count vec))]
     (if (> num-to-add 0)
-      (concat (repeat num-to-add [:div.w-full.h-48.p-2.bg-gray-200]) vec)
+      (concat (repeat num-to-add [:div.w-full.h-fit.p-2]) vec)
       vec))) 
 
 (defn season
@@ -70,10 +70,6 @@
       :else :invalid))) 
 
 (def plants (-> planting-data keys))
-
-(def icons {:sow "🌽" :start "🌱" :transplant "🌲"})
-
-(def colors {:sow "red" :start "orange" :transplant "purple"})
 
 (defn plantings-today [{:keys [day last-frost first-frost]}]
   (->> plants
@@ -119,37 +115,53 @@
 (plantings-today (pot/map-of day last-frost first-frost)) 
 
 {::clerk/visibility {:code :fold :result :show}}
-(clerk/html
- (let [include-seasons true]
-   (html
-    [:div.grid.grid-cols-1.divide-y
-     [:div.grid.grid-cols-7.divide-x
-      (->> ["Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun"]
-           (map (fn [dow] [:div.w-full.h-8.p-2.bg-gray-100 dow])))]
-     (->> calendar
-          (map (fn [week]
-                 [:div.grid.grid-cols-7.divide-x
-                  (->> week
-                       (map (fn [day]
-                              (let [d (t/day-of-month day)
-                                    is-first (= d 1)
-                                    is-today (t/= day (t/date))
-                                    this-season (season (-> day t/month t/int))]
-                                [(keyword (str "div.w-full.h-48"
-                                               (cond is-today ".bg-indigo-200"
-                                                     is-first ".bg-gray-100")))
-                                 (when include-seasons
-                                   (cond
-                                     (= this-season :spring) [:div.w-full.h-1.bg-green-100]
-                                     (= this-season :summer) [:div.w-full.h-1.bg-lime-100]
-                                     (= this-season :fall)   [:div.w-full.h-1.bg-amber-100]
-                                     (= this-season :winter) [:div.w-full.h-1.bg-blue-100]))
-                                 [:div.m-2
-                                  (t/format (t/formatter (str (when is-first "MMM ")
-                                                              "dd")) day)]
-                                 [:div "plants go here"]])))
-                       fill-week)])))])))
- 
+(merge 
+ {:nextjournal/width :full}
+ (clerk/html
+  (let [include-seasons true]
+    (html
+     [:div.grid.grid-cols-1.divide-y.w-full.px-1.bg-gray-100
+      [:div.grid.grid-cols-7.divide-x
+       (->> ["Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun"]
+            (map (fn [dow] [:div.w-full.h-8.p-2 dow])))]
+      (->> calendar
+           (map (fn [week]
+                  [:div.grid.grid-cols-7.divide-x
+                   (->> week
+                        (map (fn [day]
+                               (let [d (t/day-of-month day)
+                                     is-first (= d 1)
+                                     is-today (t/= day (t/date))
+                                     this-season (season (-> day t/month t/int))
+                                     plantings (plantings-today 
+                                                (pot/map-of day first-frost last-frost))]
+                                 [(keyword (str "div.w-full.h-fit.pb-2.rounded"
+                                                (cond is-today ".bg-indigo-200"
+                                                      is-first (case this-season
+                                                                 :spring ".bg-green-100"
+                                                                 :summer ".bg-lime-100"
+                                                                 :fall   ".bg-amber-100"
+                                                                 :winter ".bg-blue-100")
+                                                      :else    ".bg-white")))
+                                  (when include-seasons
+                                    (case this-season
+                                      :spring [:div.w-full.h-1.bg-green-100]
+                                      :summer [:div.w-full.h-1.bg-lime-100]
+                                      :fall   [:div.w-full.h-1.bg-amber-100]
+                                      :winter [:div.w-full.h-1.bg-blue-100]))
+                                  [:div.m-2
+                                   (t/format (t/formatter (str (when is-first "MMM ")
+                                                               "dd")) day)]
+                                  [:div.bg-green-200.rounded
+                                   (->> plantings
+                                        (map (fn [{:keys [start sow transplant plant]}]
+                                               (when (some true? [start sow transplant])
+                                                 [:div
+                                                  (str plant)
+                                                  (when start [:span "🌱"])
+                                                  (when sow [:span "🌽"])
+                                                  (when transplant [:span "🌲"])]))))]])))
+                        fill-week)])))]))))
 
 
 
