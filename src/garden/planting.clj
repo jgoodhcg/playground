@@ -1,4 +1,7 @@
+;; # 🍅 Planting Stuff
 (ns garden.planting
+  {:nextjournal.clerk/error-on-missing-vars :off
+   :nextjournal.clerk/toc true}
   (:require [nextjournal.clerk :as clerk]
             [tick.core :as t]
             [tick.alpha.interval :as t.i]
@@ -13,7 +16,9 @@
 )
 {::clerk/visibility {:code :show :result :show}}
 
-{::clerk/visibility {:code :hide :result :hide}}
+;; ## 🛠️ Getting setup
+
+;; ### ✳️ Days in the year
 (def days-of-this-year
   (->> (let [intvl (t.i/bounds (t/year))]
          (t/range
@@ -22,6 +27,7 @@
           (t/new-period 1 :days)))
        (map t/date)))
 
+;; ### ✳️ Calendar utils
 (defn days-until-next-week [date]
   (->> date
        t/day-of-week
@@ -39,13 +45,6 @@
                      ((fn [r] (some #{:precedes :meets :equals} [r])))))
           (recur start-of-next-week (inc w))
           w)))))
-
-(def calendar 
-  (-> days-of-this-year
-      (->> (group-by week-number-of-year))
-      (->> (into (sorted-map)))
-      (vals)
-      (->> (into []))))
 
 (defn fill-week
   "chatgpt wrote this function, I just renamed it and made the prefill item a hiccup vector"
@@ -69,6 +68,15 @@
       (fall month) :fall
       :else :invalid))) 
 
+;; ## 🗓️ Make a calendar
+(def calendar 
+  (-> days-of-this-year
+      (->> (group-by week-number-of-year))
+      (->> (into (sorted-map)))
+      (vals)
+      (->> (into []))))
+
+;; ## 🌱 When to plant plants
 (def plants (-> planting-data keys))
 
 (defn plantings-today [{:keys [day last-frost first-frost]}]
@@ -108,13 +116,13 @@
 
                   (pot/map-of plant start sow transplant)))))) 
 
-{::clerk/visibility {:code :show :result :show}}
+;; ### ✳️ Testing out planting function
 (def last-frost (t/date "2023-05-15")) 
 (def first-frost (t/date "2023-09-29")) 
 (def day (-> last-frost (t/>> (t/new-period -56 :days)))) 
 (plantings-today (pot/map-of day last-frost first-frost)) 
 
-{::clerk/visibility {:code :fold :result :show}}
+;; ## 🎨 Rendering the calendar
 (merge 
  {:nextjournal/width :full}
  (clerk/html
