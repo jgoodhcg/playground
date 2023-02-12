@@ -1,4 +1,6 @@
 ;; # 🍅 Planting Stuff
+;; I'm not quite satisfied with the thins I've tried for managing my garden.
+;; I want to play around with visualizing some kind of calendar that tells me when to plant my seeds.
 (ns garden.planting
   {:nextjournal.clerk/error-on-missing-vars :off
    :nextjournal.clerk/toc true}
@@ -17,7 +19,7 @@
 {::clerk/visibility {:code :show :result :show}}
 
 ;; ## 🛠️ Getting setup
-
+;; Going to focus just on this year for now
 ;; ### ✳️ Days in the year
 (def days-of-this-year
   (->> (let [intvl (t.i/bounds (t/year))]
@@ -28,6 +30,8 @@
        (map t/date)))
 
 ;; ### ✳️ Calendar utils
+;; These are some utilities I pulled in from another project.
+;; Someday I'll put these in a utility library.
 (defn days-until-next-week [date]
   (->> date
        t/day-of-week
@@ -46,6 +50,9 @@
           (recur start-of-next-week (inc w))
           w)))))
 
+;; ChatGPT helped me write these two functions.
+;; This first one usses some hiccup that will make sense in a bit. 
+;; I probably should have not included hiccup here to keep it more generic.
 (defn fill-week
   "chatgpt wrote this function, I just renamed it and made the prefill item a hiccup vector"
   [vec]
@@ -69,6 +76,7 @@
       :else :invalid))) 
 
 ;; ## 🗓️ Make a calendar
+;; ### ✳️ List of weeks
 (def calendar 
   (-> days-of-this-year
       (->> (group-by week-number-of-year))
@@ -76,10 +84,17 @@
       (vals)
       (->> (into []))))
 
-;; ## 🌱 When to plant plants
+;; ### 🌱 Plants and timing
+;; Try as I might I could not get ChatGPT to convert some spreadsheets into edn data.
+;; I had to write this by hand and fill in all the offsets from a spreadsheet I found online.
+;; https://www.ufseeds.com/crop-calculators.html
+(identity planting-data)
+
+;; List of all the plants
 (def plants (-> planting-data keys))
 
-(defn plantings-today [{:keys [day last-frost first-frost]}]
+;; A function that says what to plant given a day
+(defn plantings-for-day [{:keys [day last-frost first-frost]}]
   (->> plants
        (map (fn [plant]
               (let [info (get planting-data plant)
@@ -116,13 +131,13 @@
 
                   (pot/map-of plant start sow transplant)))))) 
 
-;; ### ✳️ Testing out planting function
+;; ### ✳️ Gut check
 (def last-frost (t/date "2023-05-15")) 
 (def first-frost (t/date "2023-09-29")) 
 (def day (-> last-frost (t/>> (t/new-period -56 :days)))) 
-(plantings-today (pot/map-of day last-frost first-frost)) 
+(plantings-for-day (pot/map-of day last-frost first-frost)) 
 
-;; ## 🎨 Rendering the calendar
+;; ### 🎨 Rendering
 (merge 
  {:nextjournal/width :full}
  (clerk/html
@@ -141,9 +156,9 @@
                                      is-first (= d 1)
                                      is-today (t/= day (t/date))
                                      this-season (season (-> day t/month t/int))
-                                     plantings (plantings-today 
+                                     plantings (plantings-for-day 
                                                 (pot/map-of day first-frost last-frost))]
-                                 [(keyword (str "div.w-full.h-fit.pb-2.rounded"
+                                 [(keyword (str "div.w-full.h-fit.pb-2"
                                                 (cond is-today ".bg-indigo-200"
                                                       is-first (case this-season
                                                                  :spring ".bg-green-100"
@@ -160,15 +175,15 @@
                                   [:div.m-2
                                    (t/format (t/formatter (str (when is-first "MMM ")
                                                                "dd")) day)]
-                                  [:div.bg-green-200.rounded
+                                  [:div.bg-green-200
                                    (->> plantings
                                         (map (fn [{:keys [start sow transplant plant]}]
                                                (when (some true? [start sow transplant])
                                                  [:div
-                                                  (str plant)
-                                                  (when start [:span "🌱"])
-                                                  (when sow [:span "🌽"])
-                                                  (when transplant [:span "🌲"])]))))]])))
+                                                  (str (when start "🌱 ")
+                                                       (when sow "🌽 ")
+                                                       (when transplant "🌲 ")
+                                                       (name plant) " ")]))))]])))
                         fill-week)])))]))))
 
 ;; ## 🔃 How about an agenda?
@@ -177,22 +192,29 @@
 (def agenda-data 
   (->> days-of-this-year
        (map (fn [day]
-              (let [is-today (t/= day (t/date))
+              (let [is-today (= day (t/date))
+                    is-first-frost (= day first-frost)
+                    is-last-frost (= day last-frost)
                     this-season (season (-> day t/month t/int))
                     plantings (->> (pot/map-of day first-frost last-frost)
-                                   plantings-today
+                                   plantings-for-day
                                    (map (fn [{:keys [start sow transplant plant]}]
                                           (when (some true? [start sow transplant])
-                                            (str (name plant) " "
-                                                 (when start "🌱")
-                                                 (when sow "🌽")
-                                                 (when transplant "🌲")))))
+                                            (str (when start "🌱 ")
+                                                 (when sow "🌽 ")
+                                                 (when transplant "🌲 ")
+                                                 (name plant)))))
                                    (remove nil?))]
-                (when (or is-today (not-empty plantings))
-                  {:date      day
-                   :is-today  is-today
-                   :season    this-season
-                   :plantings plantings}))))
+                (when (or is-today
+                          is-first-frost
+                          is-last-frost
+                          (not-empty plantings))
+                  {:date           day
+                   :is-today       is-today
+                   :is-first-frost is-first-frost
+                   :is-last-frost  is-last-frost
+                   :season         this-season
+                   :plantings      plantings}))))
        (remove nil?)
        (sort-by :date)))
 
@@ -201,22 +223,29 @@
  (html
   [:div
    (->> agenda-data
-        (map (fn [{:keys [date is-today plantings season]}]
-               [(keyword (str "div.w-40.border-l-2.border-r-2.border-b-2.my-2"
-                              (if is-today ".border-indigo-200"
+        (map (fn [{:keys [date is-today plantings season is-last-frost is-first-frost]}]
+               [(keyword (str "div.w-40.border-l-2.border-r-2.border-b-2.my-2.rounded"
+                              (if (or is-today
+                                      is-last-frost
+                                      is-first-frost) ".border-indigo-200"
                                   (case season
                                     :spring ".border-teal-100"
                                     :summer ".border-green-100"
                                     :fall ".border-amber-100"
                                     :winter ".border-blue-100"))))
-                [(keyword (str "div"
-                               (if is-today ".bg-indigo-200"
+                [(keyword (str "div.p-1"
+                               (if (or is-today
+                                      is-last-frost
+                                      is-first-frost) ".bg-indigo-200"
                                    (case season
                                      :spring ".bg-teal-100"
                                      :summer ".bg-green-100"
                                      :fall ".bg-amber-100"
                                      :winter ".bg-blue-100"))))
-                 (->> date (t/format (t/formatter "MMM dd")))]
+                 (str (when is-today "📅 ")
+                      (when is-first-frost "⛄ ")
+                      (when is-last-frost "⛄ ")
+                      (->> date (t/format (t/formatter "MMM dd"))))]
 
                 (when (not-empty plantings)
                   [:div.p-1
