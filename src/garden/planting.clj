@@ -171,9 +171,57 @@
                                                   (when transplant [:span "🌲"])]))))]])))
                         fill-week)])))]))))
 
+;; ## 🔃 How about an agenda?
 
+;; ### ✳️ Generating data
+(def agenda-data 
+  (->> days-of-this-year
+       (map (fn [day]
+              (let [is-today (t/= day (t/date))
+                    this-season (season (-> day t/month t/int))
+                    plantings (->> (pot/map-of day first-frost last-frost)
+                                   plantings-today
+                                   (map (fn [{:keys [start sow transplant plant]}]
+                                          (when (some true? [start sow transplant])
+                                            (str (name plant) " "
+                                                 (when start "🌱")
+                                                 (when sow "🌽")
+                                                 (when transplant "🌲")))))
+                                   (remove nil?))]
+                (when (or is-today (not-empty plantings))
+                  {:date      day
+                   :is-today  is-today
+                   :season    this-season
+                   :plantings plantings}))))
+       (remove nil?)
+       (sort-by :date)))
 
+;; ### 🎨 Rendering
+(clerk/html
+ (html
+  [:div
+   (->> agenda-data
+        (map (fn [{:keys [date is-today plantings season]}]
+               [(keyword (str "div.w-40.border-l-2.border-r-2.border-b-2.my-2"
+                              (if is-today ".border-indigo-200"
+                                  (case season
+                                    :spring ".border-teal-100"
+                                    :summer ".border-green-100"
+                                    :fall ".border-amber-100"
+                                    :winter ".border-blue-100"))))
+                [(keyword (str "div"
+                               (if is-today ".bg-indigo-200"
+                                   (case season
+                                     :spring ".bg-teal-100"
+                                     :summer ".bg-green-100"
+                                     :fall ".bg-amber-100"
+                                     :winter ".bg-blue-100"))))
+                 (->> date (t/format (t/formatter "MMM dd")))]
 
+                (when (not-empty plantings)
+                  [:div.p-1
+                   (->> plantings
+                        (map (fn [s] [:div s])))])])))]))
 
 
  
