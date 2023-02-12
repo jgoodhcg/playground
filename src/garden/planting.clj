@@ -90,22 +90,33 @@
                      fall-transplant-offset :transplant}
                     (:fall info)
 
-                    spring-start      (-> last-frost (t/>> (t/new-period spring-start-offset :days)))
-                    spring-sow        (-> last-frost (t/>> (t/new-period spring-sow-offset :days)))
-                    spring-transplant (-> last-frost (t/>> (t/new-period spring-transplant-offset :days)))
+                    offset-days (fn [offset frost]
+                                  (when offset
+                                    (-> frost
+                                        (t/>> (t/new-period offset :days)))))
 
-                    fall-start      (-> first-frost (t/>> (t/new-period fall-start-offset :days)))
-                    fall-sow        (-> first-frost (t/>> (t/new-period fall-sow-offset :days)))
-                    fall-transplant (-> first-frost (t/>> (t/new-period fall-transplant-offset :days)))
-                    
-                    start      (or (t/= spring-start day)
-                                   (t/= fall-start day))
-                    sow        (or (t/= spring-sow day)
-                                   (t/= fall-sow day))
-                    transplant (or (t/= spring-transplant day)
-                                   (t/= fall-transplant day))]
+                    spring-start      (offset-days spring-start-offset last-frost)
+                    spring-sow        (offset-days spring-sow-offset last-frost)
+                    spring-transplant (offset-days spring-transplant-offset last-frost)
+                    fall-start        (offset-days fall-start-offset first-frost)
+                    fall-sow          (offset-days fall-sow-offset first-frost)
+                    fall-transplant   (offset-days fall-transplant-offset first-frost)
 
-                (pot/map-of start sow transplant))))))
+                    action-today (fn [spring-action fall-action day]
+                                       (or (= spring-action day)
+                                           (= fall-action day)))
+
+                    start      (action-today spring-start fall-start day)
+                    sow        (action-today spring-sow fall-sow day)
+                    transplant (action-today spring-transplant fall-transplant day)]
+
+                  (pot/map-of plant start sow transplant)))))) 
+
+{::clerk/visibility {:code :show :result :show}}
+(def last-frost (t/date "2023-05-15")) 
+(def first-frost (t/date "2023-09-29")) 
+(def day (-> last-frost (t/>> (t/new-period -56 :days)))) 
+(plantings-today (pot/map-of day last-frost first-frost)) 
 
 {::clerk/visibility {:code :fold :result :show}}
 (clerk/html
