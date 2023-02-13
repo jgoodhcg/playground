@@ -1,5 +1,5 @@
 ;; # 🍅 Planting Stuff
-;; I'm not quite satisfied with the thins I've tried for managing my garden.
+;; I'm not quite satisfied with the things I've tried for managing my garden.
 ;; I want to play around with visualizing some kind of calendar that tells me when to plant my seeds.
 (ns garden.planting
   {:nextjournal.clerk/error-on-missing-vars :off
@@ -15,12 +15,18 @@
 (comment
   (clerk/serve! {:watch-paths ["src" "resources"] :browse? true}) 
   (clerk/show! "src/garden/planting.clj") 
+  (clerk/build! {:paths ["src/garden/plantin.clj"] 
+                 :out-path "clerk-static"
+                 :bundle true
+                 :ssr true
+                 :compile-css true
+                 :browse true})
 )
 {::clerk/visibility {:code :show :result :show}}
 
-;; ## 🛠️ Getting setup
+;; ## 🚧 Setup
 ;; Going to focus just on this year for now
-;; ### ✳️ Days in the year
+;; ### ⏳ Days in the year
 (def days-of-this-year
   (->> (let [intvl (t.i/bounds (t/year))]
          (t/range
@@ -29,7 +35,7 @@
           (t/new-period 1 :days)))
        (map t/date)))
 
-;; ### ✳️ Calendar utils
+;; ### 🔧 Calendar utils
 ;; These are some utilities I pulled in from another project.
 ;; Someday I'll put these in a utility library.
 (defn days-until-next-week [date]
@@ -75,8 +81,8 @@
       (fall month) :fall
       :else :invalid))) 
 
-;; ## 🗓️ Make a calendar
-;; ### ✳️ List of weeks
+;; ## 🗓️ Calendar
+;; ### 📆 List of weeks
 (def calendar 
   (-> days-of-this-year
       (->> (group-by week-number-of-year))
@@ -131,13 +137,22 @@
 
                   (pot/map-of plant start sow transplant)))))) 
 
-;; ### ✳️ Gut check
+;; ### 🐞 Quick test
 (def last-frost (t/date "2023-05-15")) 
 (def first-frost (t/date "2023-09-29")) 
 (def day (-> last-frost (t/>> (t/new-period -56 :days)))) 
 (plantings-for-day (pot/map-of day last-frost first-frost)) 
 
-;; ### 🎨 Rendering
+;; ### 🎨 Calendar Render
+
+;; Icon key
+
+;; 🌱 Starting indoors
+
+;; 🌽 Sowing directly in the ground 
+
+;; 🌲 Transplanting starts outside
+
 (merge 
  {:nextjournal/width :full}
  (clerk/html
@@ -186,9 +201,9 @@
                                                        (name plant) " ")]))))]])))
                         fill-week)])))]))))
 
-;; ## 🔃 How about an agenda?
+;; ## ✅ Agenda
 
-;; ### ✳️ Generating data
+;; ### 💾 Generating data
 (def agenda-data 
   (->> days-of-this-year
        (map (fn [day]
@@ -218,13 +233,13 @@
        (remove nil?)
        (sort-by :date)))
 
-;; ### 🎨 Rendering
+;; ### 🎨 Agenda Render
 (clerk/html
  (html
-  [:div
+  [:div.grid.grid-cols-4
    (->> agenda-data
         (map (fn [{:keys [date is-today plantings season is-last-frost is-first-frost]}]
-               [(keyword (str "div.w-40.border-l-2.border-r-2.border-b-2.my-2.rounded"
+               [(keyword (str "div.w-40.border-l-2.border-r-2.border-b-2.mb-2.rounded"
                               (if (or is-today
                                       is-last-frost
                                       is-first-frost) ".border-indigo-200"
