@@ -13,15 +13,15 @@
 
 {::clerk/visibility {:code :hide :result :hide}}
 (comment
-  (clerk/serve! {:watch-paths ["src" "resources"] :browse? true}) 
-  (clerk/show! "src/garden/planting.clj") 
-  (clerk/build! {:paths ["src/garden/plantin.clj"] 
-                 :out-path "clerk-static"
+  (clerk/serve! {:watch-paths ["src" "resources"] :browse? true})
+  (clerk/show! "src/garden/planting.clj")
+  (clerk/build! {:paths ["src/garden/planting.clj"]
+                 ;; :out-path "resources/clerk_output/"
                  :bundle true
-                 :ssr true
-                 :compile-css true
+                 ;; :ssr true
+                 ;; :compile-css true
                  :browse true})
-)
+  )
 {::clerk/visibility {:code :show :result :show}}
 
 ;; ## 🚧 Setup
@@ -236,7 +236,7 @@
 ;; ### 🎨 Agenda Render
 (clerk/html
  (html
-  [:div.grid.grid-cols-4
+  [:div.grid.grid-cols-2..md:grid-cols-3.lg:grid-cols-4
    (->> agenda-data
         (map (fn [{:keys [date is-today plantings season is-last-frost is-first-frost]}]
                [(keyword (str "div.w-40.border-l-2.border-r-2.border-b-2.mb-2.rounded"

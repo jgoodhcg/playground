@@ -24,3 +24,5 @@ resources/
 .clj-kondo/
 
 .lsp/
+
+public/build/
