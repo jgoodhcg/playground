@@ -26,5 +26,6 @@
          philoskim/debux                     {:mvn/version "0.7.3"}
          tick/tick                           {:mvn/version "0.5.0"}
          thheller/shadow-cljs                {:mvn/version "2.11.1"}
-         hiccup/hiccup                       {:mvn/version "1.0.5"}}
+         hiccup/hiccup                       {:mvn/version "1.0.5"}
+         quil/quil                           {:mvn/version "4.0.0-SNAPSHOT-1"}}
  :paths ["src" "resources"]}
