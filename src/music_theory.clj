@@ -214,3 +214,8 @@
 ;; /chatgpt
 
 (!> [:percussion :a :b :c])
+
+
+;; Given a chord progression like [:V :I :vi :IV], and a key like :c returns a vector of chords
+(defn chord-progression [key progression]
+    (map #(chord key %) progression))
