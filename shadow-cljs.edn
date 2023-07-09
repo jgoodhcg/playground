@@ -9,10 +9,19 @@
    :asset-path "/assets/nivo-fat-secret/js"
    :modules    {:main {:entries [nivo.fat-secret]}}
    :devtools   {:http-root "public/assets/nivo-fat-secret"}}
+
   :memento-mori
   {:target     :browser
    :output-dir "public/assets/memento-mori/js"
    :asset-path "/assets/memento-mori/js"
    :modules    {:main {:entries [memento-mori.index]}}
    :devtools   {:http-root "public/assets/memento-mori"
-                :http-port 3001}}}}
+                :http-port 3001}}
+
+  :quil-cljs-test-render
+  {:target     :browser
+   :output-dir "public/assets/quil-cljs/test-render/js"
+   :asset-path "/assets/quil-cljs/test-render/js"
+   :modules    {:main {:entries [quil-cljs.test-render]}}
+   :devtools   {:http-root "public/assets/quil-cljs/test-render/"
+                :http-port 3002}}}}

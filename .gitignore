@@ -26,3 +26,5 @@ resources/
 .lsp/
 
 public/build/
+
+public/assets/quil-cljs/test-render/js/
