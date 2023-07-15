@@ -1,0 +1,8 @@
+{:min-bb-version "0.8.156"
+ :paths          ["bb"]
+ :deps           {failjure/failjure                       {:mvn/version "2.2.0"}
+                  clojure-term-colors/clojure-term-colors {:mvn/version "0.1.0"}
+                  org.babashka/cli                        {:mvn/version "0.4.39"}
+                  mvxcvi/puget                            {:mvn/version "1.3.4"}
+                  cljc.java-time/cljc.java-time           {:mvn/version "0.1.12"}
+                  org.babashka/json                       {:mvn/version "0.1.1"}}}

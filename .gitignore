@@ -28,3 +28,7 @@ resources/
 public/build/
 
 public/assets/quil-cljs/test-render/js/
+
+bb/secrets.clj
+
+bb/playground/bb/secrets.clj
