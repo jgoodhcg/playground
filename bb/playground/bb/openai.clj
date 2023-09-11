@@ -50,9 +50,9 @@
                        {:body (json/write-str
                                {:model    "gpt-3.5-turbo"
                                 :messages [{:role    "system"
-                                            :content "You are a helpful assistant"}
+                                            :content "You are an experienced chef"}
                                            {:role    "user"
-                                            :content "hello?"}]})}))
+                                            :content "What's a good way to make pizza?"}]})}))
       print-response
       ))
 
