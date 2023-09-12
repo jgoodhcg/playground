@@ -11,7 +11,7 @@
          datascript/datascript               {:mvn/version "1.0.3"}
          edna/edna                           {:mvn/version "1.6.0"}
          funcool/cuerdas                     {:mvn/version "2020.03.26-3"}
-         io.github.nextjournal/clerk         {:mvn/version "0.12.707"}
+         io.github.nextjournal/clerk         {:mvn/version "0.14.919"}
          kixi/stats                          {:mvn/version "0.5.2"}
          metasoarous/oz                      {:mvn/version "2.0.0-alpha1"}
          metosin/potpuri                     {:mvn/version "0.5.2"}

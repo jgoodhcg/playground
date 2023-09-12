@@ -4,8 +4,7 @@
             [clojure.string :as str]))
 
 (comment
-  (clerk/serve! {:browse? true})
-  (clerk/show! "/home/justin/projects/playground/src/clerk_notebooks/transactions_2023_09_11.clj")
+  (clerk/serve! {:watch-paths ["src/clerk_notebooks"]})
   )
 
 ; # Hello, Clerk 👋
@@ -21,9 +20,13 @@
       slurp
       csv/read-csv
       csv-data->maps
-      #_
-      (->> (filter #(= "Subscriptions" (get % "Category"))))
-      (->> (filter #(= "Groceries" (get % "Category"))))
+      (->> (filter #(contains?
+                #{"Groceries"
+                  "Restaurants"
+                  "Food Delivery"
+                  "Fast Food"
+                  "Farmer's Market"}
+                (get % "Category"))))
       #_#_first
         (select-keys ["Amount" "Category" "Date"])))
 
@@ -38,27 +41,27 @@
 (defn sum-by-year-month [records]
   (->> records
        (map (fn [record]
-              (let [{:strs [Amount Date]} record
+              (let [{:strs [Amount Date Category]} record
                     yearmonth (to-year-month Date)
                     amount (Math/abs (Float. (clojure.string/replace Amount #"[^\d.-]" "")))]
-                {:yearmonth yearmonth, :amount amount})))
-       (group-by :yearmonth)
-       (map (fn [[yearmonth grouped]]
-              {:yearmonth yearmonth, :total (reduce + (map :amount grouped))}))
-       (sort-by :yearmonth)))
-
+                {:yearmonth yearmonth, :amount amount, :category Category})))
+       (group-by (fn [{:keys [yearmonth category]}] [yearmonth category]))
+       (map (fn [[[yearmonth category] grouped]]
+              {:yearmonth yearmonth, :total (reduce + (map :amount grouped)), :category category}))
+       (sort-by (juxt :yearmonth :category))))
 
 (def data (sum-by-year-month records))
 
 (clerk/vl
  {:data     {:values data}
-  :mark     "bar"
+  :mark     {:type "bar" :width {:band 0.5}}
   :width    500
   :encoding {
-             :x {:field "yearmonth"
-                 :type  "temporal"
-                 :axis  {:title "Year-Month", :format "%Y-%m"}}
-             :y {:field "total"
-                 :type  "quantitative"
-                 :axis  {:title "Total Amount"}}
+             :x     {:field    "yearmonth"
+                     :type     "temporal"
+                     :axis     {:title "Year-Month", :format "%y-%m"}}
+             :y     {:field "total"
+                     :type  "quantitative"
+                     :axis  {:title "Total Amount"}}
+             :color {:field "category"}
              }})
