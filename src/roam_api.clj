@@ -3,7 +3,8 @@
             [clj-http.client :as http]
             [secrets :refer [roam-api-token]]
             [potpuri.core :as pot]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clojure.pprint :refer [pprint]]))
 
 (def selector
   [:block/uid
@@ -62,5 +63,31 @@
       str
       (->> (pull-many selector)))
 
+  (let [initial-result (pull selector eid)
+        first-string   (get initial-result ":block/string")
+        first-children (-> initial-result
+                           (get ":block/children")
+                           (->> (map (fn [c] [:block/uid (get c ":block/uid")])))
+                           vec
+                           str
+                           (->> (pull-many selector)))]
+    (loop [result first-children
+           text   first-string]
+      (pprint (pot/map-of result text))
+      (Thread/sleep 1000)
+      (let [s        (->> result
+                          (map (fn [b] (str (get b ":block/string"))))
+                          (str/join "\n"))
+            children (->> result (map (fn [b] (get b ":block/children"))) flatten)]
+        (if (seq children)
+          (recur (->> children
+                      (remove nil?)
+                      (map (fn [c] [:block/uid (get c ":block/uid")]))
+                      vec
+                      str
+                      (pull-many selector))
+                 (str text "\n" s))
+          (str text " \n " s)))
+      ))
 ;;
   )
