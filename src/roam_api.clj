@@ -1,9 +1,9 @@
 (ns roam-api
-  (:require [com.roamresearch.sdk.backend :as api]
+  (:require [clojure.data.json :as json]
+            [clj-http.client :as http]
             [secrets :refer [roam-api-token]]
             [potpuri.core :as pot]
-            [clojure.string :as str]
-            [clojure.walk :refer [postwalk]]))
+            [clojure.string :as str]))
 
 (def selector
   [:block/uid
@@ -12,33 +12,31 @@
    {:block/children [:block/uid :block/string {:block/refs [:node/title :block/uid]}]}
    {:block/refs [:node/title :block/string :block/uid]}])
 
-(def eid [:block/uid "ArtdSbqUV"])
+(def eid
+  [:block/uid "ArtdSbqUV"])
 
-(def result
-  (:result (api/pull {:token roam-api-token :graph "jgood-brain"}
-                     (str selector)
-                     (str eid))))
+(def base-url "https://api.roamresearch.com/")
 
-(defn fix-keys
-  [m]
-  ;; Results coming out of the sdk function have fully namespaced keys.
-  ;; The way I see them at the repl is with shorthand notation like `::block/refs`.
-  ;; When I try to access them with something like `(-> result :result ::block/refs)`
-  ;; it fails because `blocks` is not defined
-  ;; If I create that namespace it doesn't match.
-  ;; If I try `(-> result :result :block/refs)` it also fails because that doesn't match.
-  ;; The below fixes that so the keys match the selectors -- `:block/refs`
-  (postwalk (fn [k?]
-              (if (keyword? k?)
-                (keyword (->> k? namespace rest (str/join ""))
-                         (->> k? name))
-                k?)) m))
+(defn api [graph-name action]
+  (case action
+    :pull      (str base-url "api/graph/" graph-name "/pull")
+    :pull-many (str base-url "api/graph/" graph-name "/pull-many")))
 
 (comment
-  (-> result
-      fix-keys
-      :block/refs
-      )
+  (-> (http/post (api "jgood-brain" :pull)
+                 {:headers           {"Authorization" (str "Bearer " roam-api-token)}
+                   ;; important that selector and eid are strings of edn not json
+                  :body              (json/write-str {:selector (str selector)
+                                                      :eid      (str eid)})
+                  :content-type      :json
+                  :accept            :json
+                   ;; technically redirects were designed to only work on GET and HEAD based on RFCs for http
+                   ;; but people use them for post all the time
+                  :redirect-strategy :lax})
+      :body
+      json/read-str
+      (get "result")
+      keys)
 
-  ;;
+;;
   )
