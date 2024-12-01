@@ -29,5 +29,6 @@
          tick/tick                           {:mvn/version "0.5.0"}
          thheller/shadow-cljs                {:mvn/version "2.11.1"}
          hiccup/hiccup                       {:mvn/version "1.0.5"}
-         quil/quil                           {:mvn/version "4.0.0-SNAPSHOT-1"}}
+         quil/quil                           {:mvn/version "4.0.0-SNAPSHOT-1"}
+         com.roamresearch/backend-sdk        {:mvn/version "0.0.4"}}
  :paths ["src" "resources"]}
