@@ -196,47 +196,65 @@
      [roam.ui.command-palette :refer [add-command]]))
 
   (defn get-text []
-    (pprint (let [selector       [:block/uid
-                                  :node/title
-                                  :block/string
-                                  {:block/children [:block/uid]}
-                                  {:block/refs [:node/title :block/uid]}]
-                  initial-result (pull selector [:block/uid "ArtdSbqUV"])]
-              (loop [stack  [[initial-result 0]]
-                     text   ""
-                     status {:n 0}]
-                (pprint {:status status #_#_#_#_:text text :stack stack})
-                (if (empty? stack)
-                  text
-                  (let [[current depth]  (first stack)
-                        rest-stack       (rest stack)
-                        current-string   (or (get current :block/string) (get current :node/title))
-                        current-children (get current :block/children)
-                        child-uids       (when current-children
-                                           (->> current-children (mapv (fn [c] [:block/uid (get c :block/uid)]))))
-                        child-blocks     (when (seq child-uids)
-                                           (->> child-uids (mapv (fn [b] (pull selector b)))))
-                        refs-uids        (get current :block/refs)
-                        page-refs        (->> refs-uids
-                                              (map (fn [r] [:node/title (get r :node/title)]))
-                                              (remove (fn [e] (-> e second nil?))))
-                        block-refs       (->> refs-uids
-                                              (map (fn [r] [:block/uid (get r :block/uid)]))
-                                              (remove (fn [e] (-> e second nil?))))
-                        refs             (->> (concat page-refs block-refs)
-                                              (mapv (fn [r] (pull selector r))))
-                        new-stack        (concat
-                                          ;; children blocks go first for depth first traversal
-                                          (->> child-blocks (map (fn [b] [b (inc depth)])))
-                                          ;; then the rest of the children blocks
-                                          rest-stack
-                                          ;; then put the refs at the end so that they get processed last
-                                          ;; start at 0 depth as if they are footnotes
-                                          (->> refs (map (fn [r] [r 0]))))
-                        indent           (apply str (repeat depth "  "))
-                        new-text         (str text (when (not (blank? text)) "\n") indent current-string)]
-                    (recur new-stack new-text (update status :n inc))))))))
+    (pprint
+     (let [selector       [:block/uid
+                           :node/title
+                           :block/string
+                           {:block/children [:block/uid]}
+                           {:block/refs [:node/title :block/uid]}]
+           initial-result (pull selector [:block/uid "ArtdSbqUV"])
+           visited-uids   (atom #{})] ; Keep track of visited UIDs
+       (loop [stack  [[initial-result 0]]
+              text   ""
+              status {:n 0}]
+         (pprint {:status status :stack (count stack)})
+         (if (empty? stack)
+           text
+           (let [[current depth]  (first stack)
+                 rest-stack       (rest stack)
+                 current-uid      (or (get current :block/uid) (get current :node/title))
+                 _                (when current-uid
+                                    (swap! visited-uids conj current-uid))
+                 current-string   (or (get current :block/string) (get current :node/title))
+                 current-children (get current :block/children)
+                 child-uids       (when current-children
+                                    (->> current-children
+                                         (mapv #(get % :block/uid))
+                                         (remove nil?)
+                                         ;; Exclude visited UIDs
+                                         (remove @visited-uids)))
+                 child-blocks     (when (seq child-uids)
+                                    (->> child-uids
+                                         (mapv #(pull selector [:block/uid %]))))
+                 refs-uids        (get current :block/refs)
+                 refs-uids        (when refs-uids
+                                    (->> refs-uids
+                                         (map #(or (get % :block/uid) (get % :node/title)))
+                                         (remove nil?)
+                                         ;; Exclude visited UIDs
+                                         (remove @visited-uids)))
+                 refs             (when (seq refs-uids)
+                                    (->> refs-uids
+                                         (mapv (fn [uid]
+                                                 (if (string? uid)
+                                                   ;; It's a block UID
+                                                   (pull selector [:block/uid uid])
+                                                   ;; It's a page title
+                                                   (pull selector [:node/title uid]))))))
+                 _                (when refs-uids
+                                    (swap! visited-uids into refs-uids))
+                 new-stack        (concat
+                                   ;; Children blocks go first for depth-first traversal
+                                   (mapv #(vector % (inc depth)) child-blocks)
+                                   rest-stack
+                                   ;; Refs are processed last
+                                   (mapv #(vector % 0) refs))
+                 indent           (apply str (repeat depth "  "))
+                 new-text         (str text (when (not (blank? text)) "\n") indent current-string)]
+             (recur new-stack new-text (update status :n inc))))))))
 
-  (add-command {:label "get-ai-text" :callback get-text})
+  ;; cmd + p
+  (add-command {:label "test-gen-ai-text" :callback get-text})
+
   ;;
   )
