@@ -188,7 +188,7 @@
 ;; and how I intend to use it
 ;; the api was also similar enough to port most of the code
 (comment
-  (ns roam.cljs.test.b
+  (ns roam.ai.gen.retrieval-script.v1
     (:require
      [roam.datascript :refer [pull]]
      [clojure.pprint :refer [pprint]]
@@ -197,12 +197,16 @@
 
   (defn get-text []
     (pprint
-     (let [selector       [:block/uid
+     (let [page-selector  [:block/uid
+                           :node/title
+                           :block/string
+                           {:block/children [:block/uid]}]
+           block-selector [:block/uid
                            :node/title
                            :block/string
                            {:block/children [:block/uid]}
                            {:block/refs [:node/title :block/uid]}]
-           initial-result (pull selector [:block/uid "ArtdSbqUV"])
+           initial-result (pull page-selector [:block/uid "ArtdSbqUV"])
            visited-uids   (atom #{})] ; Keep track of visited UIDs
        (loop [stack  [[initial-result 0]]
               text   ""
@@ -225,7 +229,7 @@
                                          (remove @visited-uids)))
                  child-blocks     (when (seq child-uids)
                                     (->> child-uids
-                                         (mapv #(pull selector [:block/uid %]))))
+                                         (mapv #(pull block-selector [:block/uid %]))))
                  refs-uids        (get current :block/refs)
                  refs-uids        (when refs-uids
                                     (->> refs-uids
@@ -238,9 +242,9 @@
                                          (mapv (fn [uid]
                                                  (if (string? uid)
                                                    ;; It's a block UID
-                                                   (pull selector [:block/uid uid])
+                                                   (pull block-selector [:block/uid uid])
                                                    ;; It's a page title
-                                                   (pull selector [:node/title uid]))))))
+                                                   (pull page-selector [:node/title uid]))))))
                  _                (when refs-uids
                                     (swap! visited-uids into refs-uids))
                  new-stack        (concat
@@ -254,7 +258,7 @@
              (recur new-stack new-text (update status :n inc))))))))
 
   ;; cmd + p
-  (add-command {:label "test-gen-ai-text" :callback get-text})
+  (add-command {:label "roam-rag" :callback get-text})
 
   ;;
   )
