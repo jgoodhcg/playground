@@ -193,20 +193,21 @@
      [roam.datascript :refer [pull]]
      [clojure.pprint :refer [pprint]]
      [clojure.string :refer [blank?]]
-     [roam.ui.command-palette :refer [add-command]]))
+     [roam.ui.command-palette :refer [add-command remove-command]]))
 
   (defn get-text []
     (pprint
      (let [page-selector  [:block/uid
                            :node/title
                            :block/string
+                           ;; no refs for pages (makes result too large)
                            {:block/children [:block/uid]}]
            block-selector [:block/uid
                            :node/title
                            :block/string
                            {:block/children [:block/uid]}
                            {:block/refs [:node/title :block/uid]}]
-           initial-result (pull page-selector [:block/uid "ArtdSbqUV"])
+           initial-result (pull block-selector [:block/uid "ArtdSbqUV"])
            visited-uids   (atom #{})] ; Keep track of visited UIDs
        (loop [stack  [[initial-result 0]]
               text   ""
@@ -214,51 +215,108 @@
          (pprint {:status status :stack (count stack)})
          (if (empty? stack)
            text
-           (let [[current depth]  (first stack)
-                 rest-stack       (rest stack)
-                 current-uid      (or (get current :block/uid) (get current :node/title))
-                 _                (when current-uid
-                                    (swap! visited-uids conj current-uid))
-                 current-string   (or (get current :block/string) (get current :node/title))
-                 current-children (get current :block/children)
-                 child-uids       (when current-children
-                                    (->> current-children
-                                         (mapv #(get % :block/uid))
-                                         (remove nil?)
-                                         ;; Exclude visited UIDs
-                                         (remove @visited-uids)))
-                 child-blocks     (when (seq child-uids)
-                                    (->> child-uids
-                                         (mapv #(pull block-selector [:block/uid %]))))
-                 refs-uids        (get current :block/refs)
-                 refs-uids        (when refs-uids
-                                    (->> refs-uids
-                                         (map #(or (get % :block/uid) (get % :node/title)))
-                                         (remove nil?)
-                                         ;; Exclude visited UIDs
-                                         (remove @visited-uids)))
-                 refs             (when (seq refs-uids)
-                                    (->> refs-uids
-                                         (mapv (fn [uid]
-                                                 (if (string? uid)
-                                                   ;; It's a block UID
-                                                   (pull block-selector [:block/uid uid])
-                                                   ;; It's a page title
-                                                   (pull page-selector [:node/title uid]))))))
-                 _                (when refs-uids
-                                    (swap! visited-uids into refs-uids))
-                 new-stack        (concat
-                                   ;; Children blocks go first for depth-first traversal
-                                   (mapv #(vector % (inc depth)) child-blocks)
-                                   rest-stack
-                                   ;; Refs are processed last
-                                   (mapv #(vector % 0) refs))
-                 indent           (apply str (repeat depth "  "))
-                 new-text         (str text (when (not (blank? text)) "\n") indent current-string)]
-             (recur new-stack new-text (update status :n inc))))))))
+           (let [[current depth] (first stack)
+                 rest-stack      (rest stack)
+                 refs-ids        (get current :block/refs)
+                 block-ref-uids  (when refs-ids
+                                   (->> refs-ids
+                                        (map #(get % :block/uid))
+                                        (remove nil?)
+                                        (remove @visited-uids)))
+                 node-ref-titles (when refs-ids
+                                   (->> refs-ids
+                                        (map #(get % :node/title))
+                                        (remove nil?)
+                                        (remove @visited-uids)))
+                 ignore          (->> node-ref-titles
+                                      (some #{"sensitive"
+                                              "my personal journal"
+                                              "health"
+                                              "dream"
+                                              "Archemedx"})
+                                      some?)]
+             (if ignore
+               ;; Don't utilize any blocks referencing ignore titles
+               (recur rest-stack text (update status :n inc))
+
+               ;; Otherwise continue processing
+               (let [current-uid      (or (get current :block/uid) (get current :node/title))
+                     _                (when current-uid (swap! visited-uids conj current-uid))
+                     current-string   (or (get current :block/string) (get current :node/title))
+                     current-children (get current :block/children)
+                     child-uids       (when current-children
+                                        (->> current-children
+                                             (mapv #(get % :block/uid))
+                                             (remove nil?)
+                                             (remove @visited-uids)))
+                     child-blocks     (when (seq child-uids)
+                                        (->> child-uids
+                                             (mapv #(pull block-selector [:block/uid %]))))
+                     refs             (concat
+                                       (->> block-ref-uids (mapv (fn [uid] (pull block-selector [:block/uid uid]))))
+                                       (->> node-ref-titles (mapv (fn [title] (pull page-selector [:node/title title])))))
+                     _                (when node-ref-titles
+                                        (swap! visited-uids into node-ref-titles))
+                     _                (when block-ref-uids
+                                        (swap! visited-uids into block-ref-uids))
+                     new-stack        (concat
+                                       ;; Children blocks go first for depth-first traversal
+                                       (mapv #(vector % (inc depth)) child-blocks)
+                                       rest-stack
+                                       ;; Refs are processed last
+                                       (mapv #(vector % 0) refs))
+                     indent           (apply str (repeat depth "  "))
+                     new-text         (str text (when (not (blank? text)) "\n") indent current-string)]
+                 (recur new-stack new-text (update status :n inc))))))))))
 
   ;; cmd + p
+  (remove-command {:label "roam-rag"})
   (add-command {:label "roam-rag" :callback get-text})
 
   ;;
   )
+
+;; examples of '[*]
+(comment
+  {:create/user {:db/id 1},
+   :block/string
+   "[Listed out projects](((1145XASm6))) from the [[project]]s page that are still interesting to me now ",
+   :create/time 1732926681014,
+   :block/refs [{:db/id 3064} {:db/id 73536}],
+   :edit/user {:db/id 1},
+   :block/children
+   [{:db/id 73556}
+    {:db/id 73558}
+    {:db/id 73561}
+    {:db/id 73565}
+    {:db/id 73567}
+    {:db/id 73582}
+    {:db/id 73583}
+    {:db/id 73584}
+    {:db/id 73589}
+    {:db/id 73595}
+    {:db/id 73601}],
+   :block/uid "ArtdSbqUV",
+   :block/open true,
+   :edit/time 1733025209531,
+   :db/id 73555,
+   :block/parents [{:db/id 73519}],
+   :block/order 4,
+   :block/page {:db/id 73519}}
+
+  {:create/user {:db/id 1},
+   :edit/seen-by [{:db/id 1}],
+   :attrs/lookup
+   [{:db/id 14110} {:db/id 17435} {:db/id 17831} {:db/id 69506}],
+   :create/time 1608135704738,
+   :node/title "me",
+   :edit/user {:db/id 1},
+   :block/children [{:db/id 24312} {:db/id 69497} {:db/id 69506}],
+   :block/uid "mhuTDvCSs",
+   :edit/time 1608135704740,
+   :entity/attrs
+   #{[{:source [:block/uid "mhuTDvCSs"], :value [:block/uid "mhuTDvCSs"]}
+      {:source [:block/uid "P8O5_F80K"], :value [:block/uid "Sg-1qpRJf"]}
+      {:source [:block/uid "P8O5_F80K"],
+       :value [:block/uid "1Y7s2FXCI"]}]},
+   :db/id 14110})
