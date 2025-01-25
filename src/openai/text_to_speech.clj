@@ -36,12 +36,23 @@
 
 (comment
   (save-mp3-from-text-file
-    {:text-file-path "resources/openai-audio-test.txt"
-     :mp3-file-path  "resources/eopnai-audio-test.mp3"})
+   {:text-file-path "resources/openai-audio-test.txt"
+    :mp3-file-path  "resources/eopnai-audio-test.mp3"})
 
   (save-mp3-from-text-file
-    {:text-file-path "resources/a-day-in-the-life.txt"
-     :mp3-file-path  "resources/a-day-in-the-life.mp3"})
+   {:text-file-path "resources/a-day-in-the-life.txt"
+    :mp3-file-path  "resources/a-day-in-the-life.mp3"})
 
+  (save-mp3-from-text-file
+   {:text-file-path "resources/2054-reflections.txt"
+    :mp3-file-path  "resources/2054-reflections.mp3"})
+
+  (save-mp3-from-text-file
+   {:text-file-path "resources/2054-ns-4o.txt"
+    :mp3-file-path  "resources/2054-ns-4o.mp3"})
+
+  (save-mp3-from-text-file
+   {:text-file-path "resources/2054-ns-o1.txt"
+    :mp3-file-path  "resources/2054-ns-o1.mp3"})
   ;;
   )

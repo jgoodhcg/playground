@@ -1,7 +1,8 @@
 (ns playground.bb.text-file-aggregator
   (:require [babashka.fs :as fs]
             [babashka.cli :as cli]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [clojure.pprint :refer [pprint]]))
 
 (defn text-file? [file]
   (let [name (str file)]
@@ -24,13 +25,18 @@
             (io/copy in-reader out-writer)
             (.write out-writer "\n")))))))
 
-(defn -main [& args]
-  (let [opts (cli/parse-opts args {:opts {:directory :string, :output :string}})
-        directory (:directory opts)
-        output-file (:output opts)]
-    (if (and directory output-file)
-      (concat-text-files directory output-file)
-      (println "Usage: bb aggregate.clj --directory <dir> --output <output-file>"))))
+(defn -main [args]
+  ;; Print args for debugging
+  (println "Raw args:" args)
+  (let [opts (cli/parse-opts args {:args {:directory :string
+                                          :output    :string}})]
+    ;; Debug opts
+    (println "Parsed opts:" opts)
+    (let [directory   (:directory opts)
+          output-file (:output opts)]
+      (if (and directory output-file)
+        (concat-text-files directory output-file)
+        (println "Usage: bb text_file_aggregator.clj --directory <dir> --output <output-file>")))))
 
-;; Uncomment the following line to make it executable as a script
-;; (-main *command-line-args*)
+;; bb text_file_aggregator.clj --directory <dir> --output <output-file>"
+(-main *command-line-args*)
