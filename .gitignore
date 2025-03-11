@@ -36,3 +36,5 @@ bb/playground/bb/secrets.clj
 src/clerk_notebooks/transactions_2023_09_11.csv
 
 .DS_Store
+
+CLAUDE.md
