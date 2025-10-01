@@ -30,4 +30,10 @@
          thheller/shadow-cljs                {:mvn/version "2.11.1"}
          hiccup/hiccup                       {:mvn/version "1.0.5"}
          quil/quil                           {:mvn/version "4.0.0-SNAPSHOT-1"}}
- :paths ["src" "resources"]}
+ :paths ["src" "resources"]
+ :aliases
+   {:nrepl
+      {:extra-deps {nrepl/nrepl {:mvn/version "1.1.0"}},
+       :main-opts  ["-m" "nrepl.cmdline"
+                    "--port" "7888"
+                    "--host" "127.0.0.1"]}}}

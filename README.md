@@ -36,4 +36,14 @@ bb text_file_aggregator.clj --directory <dir> --output <output-file>
 ```
 ### JVM Clojure
 
-I use Cider and Emacs and `cider-jack-in-clj` to run these projects
+Start a REPL for development:
+
+```bash
+# Start nREPL server (connects to port 7888)
+clj -M:nrepl
+
+# Or start a basic REPL
+clj
+```
+
+For editor integration, connect your Clojure plugin (vim-fireplace, conjure, etc.) to `localhost:7888` when using the nREPL option.
