@@ -4,6 +4,6 @@
 (defn stage-episode!
   "Stub for writing episode assets to disk.
 
-  Returns the assistant data unchanged for now." 
-  [context assistant-output]
-  (assoc assistant-output :episode {:status :pending :output-root (get-in context [:options :output-root])}))
+  Returns the response data unchanged for now."
+  [context response-data]
+  (assoc response-data :episode {:status :pending :output-root (get-in context [:options :output-root])}))
