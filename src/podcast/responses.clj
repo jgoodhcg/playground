@@ -32,6 +32,24 @@
      :tools [{:type "web_search"}]
      :tool-choice "auto"}))
 
+(defn- parse-metadata-and-script
+  "Parse JSON metadata from first line and extract script text."
+  [text]
+  (let [lines (str/split-lines text)
+        first-line (first lines)]
+    (if (and first-line (str/starts-with? (str/trim first-line) "{"))
+      (try
+        (let [metadata (json/parse-string first-line true)
+              script (str/join "\n" (rest lines))]
+          {:metadata metadata
+           :script (str/triml script)})
+        (catch Exception e
+          (println "[responses] Warning: Could not parse metadata JSON, using defaults")
+          {:metadata {}
+           :script text}))
+      {:metadata {}
+       :script text})))
+
 (defn- extract-text
   [body]
   (let [segments (for [item (:output body)
@@ -54,16 +72,6 @@
         api-key secrets/openai-api-key]
     (when (str/blank? api-key)
       (throw (ex-info "OPENAI_API_KEY is missing." {})))
-    (println "[responses] model=" model)
-    (println "[responses] tools=" (map :type tools))
-    (let [truncate (fn [label text]
-                     (let [max-len 120]
-                       (println label
-                                (if (<= (count text) max-len)
-                                  text
-                                  (str (subs text 0 max-len) "…")))))]
-      (truncate "[responses] instructions=" instructions)
-      (truncate "[responses] user prompt=" user-prompt))
     (let [payload (cond-> {:model model
                            :instructions instructions
                            :input [{:role "user"
@@ -80,17 +88,20 @@
                                   :throw-exceptions false})]
       (if (= 200 (:status response))
         (let [body (:body response)
-              text (or (:output_text body)
-                       (extract-text body))
+              raw-text (or (:output_text body)
+                           (extract-text body))
+              {:keys [metadata script]} (parse-metadata-and-script raw-text)
               usage (:usage body)]
           (println "[responses] tokens usage=" usage)
-          {:script   text
-           :metadata {:source  (:url (:options context))
-                      :model   model
-                      :web-search-calls (for [item (:output body)
-                                              :when (= "web_search_call" (:type item))]
-                                          (select-keys item [:id :status :action]))
-                      :usage   usage
-                       :request payload}})
+          (when (:title metadata)
+            (println "[responses] Extracted title:" (:title metadata)))
+          {:script   script
+           :metadata (merge {:source  (:url (:options context))
+                             :model   model
+                             :web-search-calls (for [item (:output body)
+                                                     :when (= "web_search_call" (:type item))]
+                                                 (select-keys item [:id :status :action]))
+                             :usage   usage}
+                            metadata)})
         (throw (ex-info "Responses API error" {:status (:status response)
                                                 :body   (:body response)}))))))

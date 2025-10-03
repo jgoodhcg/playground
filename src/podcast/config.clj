@@ -1,38 +1,61 @@
 (ns podcast.config
   "Provides default configuration and builds response settings from CLI options."
-  (:require [clojure.string :as str]))
+  (:require
+    [clojure.string :as str]))
+
+(def ^:private podcast-details
+  {:title "Too Busy To Read"
+   :description "A personal podcast feed of narrated articles."
+   :author "Justin Good"
+   :url "https://jmg.ac"
+   :feed-public-url "https://tbtr.nyc3.digitaloceanspaces.com/podcast/podcast.xml"
+   :episode-base-url "https://tbtr.nyc3.digitaloceanspaces.com/podcast/episodes/"})
 
 (def ^:private default-responses
-  {:model "gpt-4.1"
-   :max-output-tokens 6000
+  {:model "gpt-4.1",
+   :max-output-tokens 12000,
    :system-prompt
-   (str "You are an AI summarizer creating spoken transcripts for me to listen to in AudioRead. "
-        "Maintain a neutral, thoughtful narrator voice and keep the listener oriented while flowing naturally for audio. "
-        "If you lack direct access to the source material, use the web_search tool to retrieve it—start by opening the provided URL and its related discussion before broadening out. "
-        "Cite important sources inline when you reference them.")
+    (str
+      "You are a neutral, high-information-density narrator for a podcast aimed at a mid-30s software developer. "
+      "Your tone is balanced and analytical. You focus on context, mechanisms, tradeoffs, dissent, and implications, "
+      "favoring systems thinking and practical takeaways. Embody this persona directly; do not describe it or the audience."),
    :prompt-template
-   (str "You are preparing a long-form narration for the listener based on {{url}}.\n"
-        "Write in continuous paragraphs with no headings, bullets, or list markers.\n"
-        "Open by identifying the source (Hacker News, Reddit, blog, etc.), the title if known, and whether the discussion has many, few, or typical comments.\n"
-        "Front-load the most important insights, stakes, and why the listener should care before diving deeper.\n"
-        "Summarize the linked content thoroughly, weaving in extended verbatim excerpts whenever available.\n"
-        "Synthesize the top-level comments by clustering themes and highlighting different perspectives using neutral attributions such as 'one comment notes'. Expand on context, implications, and tradeoffs.\n"
-        "Convert links or code into clear plain-language descriptions and remove HTML artifacts.\n"
-        "If the source text cannot be accessed, rely on the discussion and relevant background knowledge.\n"
-        "After the summaries and commentary, transition into a more verbatim or nuanced walk-through of the original post so the listener can hear it nearly in full.\n"
-        "Be expansive—aim for up to 10,000 characters—prioritizing new information over repetition.\n"
-        "Relate points to prior interests of the listener when appropriate without inventing personal anecdotes.\n"
-        "Conclude with a single-sentence TL;DR that cleanly captures the takeaway."
-        " Ensure any referenced facts mention their source inline when possible." )})
+    (str
+      "Read the full content from this URL: {{url}}\n\n"
+      "After reading the content, produce a spoken-word narration script based on what you read.\n\n"
+      "OUTPUT FORMAT:\n"
+      "First line: JSON metadata in this exact format:\n"
+      "{\"title\": \"Brief descriptive title based on the actual content\", \"summary\": \"One sentence summary of what you read\"}\n\n"
+      "Remaining lines: The narration script\n\n"
+      "SCRIPT REQUIREMENTS:\n"
+      "- Begin immediately with the introduction to the content you read\n"
+      "- Do not include preamble, meta-commentary, or phrases like 'Here is the script...'\n"
+      "- Do not use first-person perspective ('I', 'my')\n"
+      "- Use continuous paragraphs, without headings or lists\n\n"
+      "SCRIPT STRUCTURE:\n"
+      "1. Introduce the content by stating its source, title, and nature\n"
+      "2. Analyze the conversation's sentiment and themes from what you read\n"
+      "3. Provide deeper analysis, synthesizing key insights, tradeoffs, and dissenting views from the actual content\n"
+      "4. Conclude with a verbatim reading of the original post, cleaned for audio narration\n\n"
+      "Important: Base everything on the actual content you fetch from the URL, not on assumptions or general knowledge.")})
 
 (defn build-context
   "Return the runtime context given CLI `options`, applying any overrides we support."
   [options]
-  (let [normalize-newlines (fn [s] (some-> s (str/replace "\\n" "\n")))
+  (let [normalize-newlines (fn [s]
+                             (some-> s
+                                     (str/replace "\\n" "\n")))
         responses (cond-> default-responses
-                      (:model options) (assoc :model (:model options))
-                      (:max-output-tokens options) (assoc :max-output-tokens (:max-output-tokens options))
-                      (:system-prompt options) (assoc :system-prompt (normalize-newlines (:system-prompt options)))
-                      (:prompt-template options) (assoc :prompt-template (normalize-newlines (:prompt-template options))))]
-    {:responses responses
+                    (:model options)           (assoc :model (:model options))
+                    (:max-output-tokens options) (assoc :max-output-tokens
+                                                   (:max-output-tokens options))
+                    (:system-prompt options)   (assoc :system-prompt
+                                                 (normalize-newlines
+                                                   (:system-prompt options)))
+                    (:prompt-template options) (assoc :prompt-template
+                                                 (normalize-newlines
+                                                   (:prompt-template
+                                                     options))))]
+    {:podcast podcast-details
+     :responses responses,
      :options   options}))
