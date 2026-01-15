@@ -37,5 +37,5 @@
    {:nrepl
       {:extra-deps {nrepl/nrepl {:mvn/version "1.1.0"}},
        :main-opts  ["-m" "nrepl.cmdline"
-                    "--port" "7888"
+                    "--port" "7899"
                     "--host" "127.0.0.1"]}}}

@@ -217,5 +217,26 @@
 
 
 ;; Given a chord progression like [:V :I :vi :IV], and a key like :c returns a vector of chords
-(defn chord-progression [key progression]
-    (map #(chord key %) progression))
+(defn chord-progression [scale progression]
+    (map #(chord % scale) progression))
+
+;; Royal road chord progression (I-V-vi-IV)
+(def royal-road-progression [[1 3 5] [5 7 2] [6 1 3] [4 6 1]])
+
+(defn royal-road-chords [key]
+  (let [scale-notes (scale major-intervals key)]
+    (chord-progression scale-notes royal-road-progression)))
+
+;; Play royal road progression in C major
+(!> [:piano (royal-road-chords :c)])
+
+;; Royal road with melody
+(!> [:piano
+     1/2 (first (royal-road-chords :c)) 1/8 :c :e :g
+     1/2 (second (royal-road-chords :c)) 1/8 :g :b :d
+     1/2 (nth (royal-road-chords :c) 2) 1/8 :a :c :e
+     1/2 (nth (royal-road-chords :c) 3) 1/8 :f :a :c])
+
+(!> [:piano (royal-road-chords :c)])
+;; 
+
