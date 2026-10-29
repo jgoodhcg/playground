@@ -12,10 +12,10 @@
                        ;; :pool-opts { ... }
                        :db-spec {;; :jdbcUrl  "..."
                                  ;; OR
-                                 :host     "db.zsmxqcdaontyokyayscg.supabase.co"
+                                 :host     (System/getenv "XTDB_PG_HOST")
                                  :dbname   "postgres"
                                  :user     "postgres"
-                                 :password "7b2k#Q9m6A^" ;; TODO remove secret
+                                 :password (System/getenv "XTDB_PG_PASSWORD")
                                  ;; ...
                                  }}
      ;; :poll-sleep-duration (Duration/ofSeconds 1)
@@ -25,10 +25,10 @@
                                             ;; :pool-opts { ... }
                                             :db-spec {;; :jdbcUrl  "..."
                                                       ;; OR
-                                                      :host     "db.zsmxqcdaontyokyayscg.supabase.co"
+                                                      :host     (System/getenv "XTDB_PG_HOST")
                                                       :dbname   "postgres"
                                                       :user     "postgres"
-                                                      :password "7b2k#Q9m6A^" ;; TODO remove secret
+                                                      :password (System/getenv "XTDB_PG_PASSWORD")
                                                       ;; ...
                                                       }}}
     }
